@@ -76,7 +76,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
               gap: 28,
             }}
           >
-            <Badge text="AGENCIA AI · QUITO ECUADOR" delay={0} />
+            <Badge text="AI MARKETING AGENCY" delay={0} />
             <SceneText
               text={line1}
               fontSize={92}

@@ -108,7 +108,7 @@ const InsightScene: React.FC<{ text: string; durationInFrames: number; flash?: b
     >
       <SceneFade durationInFrames={durationInFrames}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text="LO QUE PASA EN ECUADOR" delay={0} />
+          <Badge text="LO QUE NADIE TE DICE" delay={0} />
           <RichText
             text={text}
             baseFontSize={52}
