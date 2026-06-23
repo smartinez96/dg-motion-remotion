@@ -24,7 +24,8 @@ export const RemotionRoot: React.FC = () => {
           hook: '¿Cuántos clientes pierde tu negocio [[cada noche]]?',
           stat1: { number: '73%', label: 'de clientes no regresan si no hay respuesta rápida' },
           stat2: { number: '3x', label: 'más ventas con atención automatizada 24/7' },
-          insight: 'La mayoría de negocios en Ecuador pierden clientes [[mientras duermen]]',
+          insight: 'La mayoría de negocios pierden clientes [[mientras duermen]]',
+          badge: 'LO QUE NADIE TE DICE',
           cta: 'Guarda este video [[antes de que desaparezca]]',
         }}
       />

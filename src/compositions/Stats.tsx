@@ -93,7 +93,7 @@ const StatScene: React.FC<{
   );
 };
 
-const InsightScene: React.FC<{ text: string; durationInFrames: number; flash?: boolean }> = ({ text, durationInFrames, flash }) => {
+const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: number; flash?: boolean }> = ({ text, badge, durationInFrames, flash }) => {
   return (
     <AbsoluteFill
       style={{
@@ -108,7 +108,7 @@ const InsightScene: React.FC<{ text: string; durationInFrames: number; flash?: b
     >
       <SceneFade durationInFrames={durationInFrames}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text="LO QUE NADIE TE DICE" delay={0} />
+          <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
           <RichText
             text={text}
             baseFontSize={52}
@@ -182,7 +182,7 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number; flash?: boole
   );
 };
 
-export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta }) => {
+export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, badge }) => {
   const { fps } = useVideoConfig();
 
   const s1Duration = Math.round(3 * fps);
@@ -214,7 +214,7 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta }
       </Sequence>
 
       <Sequence from={s4Start} durationInFrames={s4Duration}>
-        <InsightScene text={insight} durationInFrames={s4Duration} flash />
+        <InsightScene text={insight} badge={badge} durationInFrames={s4Duration} flash />
       </Sequence>
 
       <Sequence from={s5Start} durationInFrames={s5Duration}>

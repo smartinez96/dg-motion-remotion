@@ -9,6 +9,7 @@ export type StatsProps = {
   stat2: StatItem;
   insight: string;
   cta: string;
+  badge?: string;
 };
 
 export type IntroProps = {
