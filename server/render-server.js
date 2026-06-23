@@ -13,9 +13,13 @@ const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || 'http://localhost:3333';
 const PORT = process.env.PORT || 3333;
 
+const AVATARES_DIR = path.join(__dirname, '..', 'public', 'avatares');
+
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+if (!fs.existsSync(AVATARES_DIR)) fs.mkdirSync(AVATARES_DIR, { recursive: true });
 
 app.use('/output', express.static(OUTPUT_DIR));
+app.use('/avatares', express.static(AVATARES_DIR));
 
 let bundleLocation = null;
 
