@@ -37,3 +37,15 @@ export type CarouselProps = {
   slides: SlideItem[];
   title?: string;
 };
+
+export type CaptionGroup = {
+  text: string;
+  start: number;
+  end: number;
+};
+
+export type AvatarCaptionsProps = {
+  avatarVideoUrl: string;
+  groups: CaptionGroup[];
+  audioDurationSecs: number;
+};

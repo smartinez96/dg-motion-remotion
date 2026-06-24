@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
-const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || 'http://localhost:3333';
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || 'https://digital-growth-dg-remotion.fgb9uu.easypanel.host';
 const PORT = process.env.PORT || 3333;
 
 const AVATARES_DIR = path.join(__dirname, '..', 'public', 'avatares');
@@ -41,6 +41,8 @@ const COMP_MAP = {
   full: 'DG-Full',
   carousel: 'DG-Carousel',
 };
+
+const avatarJobs = {};
 
 function buildInputProps(type, content) {
   if (type === 'stats') {
@@ -153,6 +155,73 @@ app.post('/render', async (req, res) => {
     console.error('Render error:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+app.post('/render-avatar', async (req, res) => {
+  const { content } = req.body;
+  if (!content || !content.avatarVideoUrl || !content.groups || !content.audioDurationSecs) {
+    return res.status(400).json({ error: 'content.avatarVideoUrl, content.groups, content.audioDurationSecs required' });
+  }
+
+  const jobId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  avatarJobs[jobId] = { status: 'processing' };
+  res.json({ id: jobId, status: 'processing' });
+
+  setImmediate(async () => {
+    try {
+      const serveUrl = await getBundle();
+      const OUTRO_SECS = 4;
+      const FPS = 30;
+      const durationInFrames = Math.round((content.audioDurationSecs + OUTRO_SECS) * FPS);
+
+      const inputProps = {
+        avatarVideoUrl: content.avatarVideoUrl,
+        groups: content.groups,
+        audioDurationSecs: content.audioDurationSecs,
+      };
+
+      const composition = await selectComposition({
+        serveUrl,
+        id: 'DG-AvatarCaptions',
+        inputProps,
+      });
+      composition.durationInFrames = durationInFrames;
+
+      const filename = `dg-avatar-${Date.now()}.mp4`;
+      const outputPath = path.join(OUTPUT_DIR, filename);
+
+      await renderMedia({
+        composition,
+        serveUrl,
+        codec: 'h264',
+        outputLocation: outputPath,
+        inputProps,
+        chromiumOptions: { disableWebSecurity: true },
+      });
+
+      const videoUrl = `${PUBLIC_BASE_URL}/output/${filename}`;
+      avatarJobs[jobId] = { status: 'succeeded', url: videoUrl };
+      console.log('Avatar render done:', videoUrl);
+
+      // Keep only last 10 avatar renders
+      const avatarFiles = fs.readdirSync(OUTPUT_DIR)
+        .filter((f) => f.startsWith('dg-avatar-') && f.endsWith('.mp4'))
+        .map((f) => ({ name: f, time: fs.statSync(path.join(OUTPUT_DIR, f)).mtimeMs }))
+        .sort((a, b) => b.time - a.time);
+      avatarFiles.slice(10).forEach((f) => {
+        try { fs.unlinkSync(path.join(OUTPUT_DIR, f.name)); } catch (_) {}
+      });
+    } catch (err) {
+      console.error('Avatar render error:', err);
+      avatarJobs[jobId] = { status: 'failed', error: err.message };
+    }
+  });
+});
+
+app.get('/render-avatar-status/:id', (req, res) => {
+  const job = avatarJobs[req.params.id];
+  if (!job) return res.status(404).json({ error: 'not found' });
+  res.json(job);
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));

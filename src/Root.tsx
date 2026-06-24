@@ -4,6 +4,7 @@ import { Stats } from './compositions/Stats';
 import { Intro } from './compositions/Intro';
 import { Full } from './compositions/Full';
 import { Carousel } from './compositions/Carousel';
+import { AvatarCaptions } from './compositions/AvatarCaptions';
 
 
 const W = 1080;
@@ -77,6 +78,19 @@ export const RemotionRoot: React.FC = () => {
             { headline: 'Caso [[real]]', body: 'Clínica dental en Quito: +40% de citas agendadas en el primer mes.' },
             { headline: '¿Tu negocio [[está listo]]?', body: 'Diagnóstico gratuito disponible esta semana.' },
           ],
+        }}
+      />
+      <Composition
+        id="DG-AvatarCaptions"
+        component={AvatarCaptions}
+        durationInFrames={Math.round(40 * FPS)}
+        fps={FPS}
+        width={W}
+        height={H}
+        defaultProps={{
+          avatarVideoUrl: '',
+          groups: [],
+          audioDurationSecs: 35,
         }}
       />
     </>
