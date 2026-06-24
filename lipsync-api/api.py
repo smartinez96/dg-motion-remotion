@@ -51,7 +51,7 @@ def run_inference(job_id, image_url, audio_url):
             '--face', loop,
             '--audio', wav,
             '--outfile', out,
-            '--resize_factor', '1',
+            '--resize_factor', '2',
             '--nosmooth'
         ], capture_output=True, text=True, timeout=1800, cwd='/app')
 
