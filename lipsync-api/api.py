@@ -44,7 +44,7 @@ def run_inference(job_id, image_url, audio_url):
             '-c:v', 'libx264', '-pix_fmt', 'yuv420p', loop
         ], check=True, capture_output=True)
 
-        # Wav2Lip inference
+        # Wav2Lip inference — small batches to avoid OOM on CPU
         result = subprocess.run([
             'python', '/app/inference.py',
             '--checkpoint_path', '/app/checkpoints/wav2lip_gan.pth',
@@ -52,13 +52,15 @@ def run_inference(job_id, image_url, audio_url):
             '--audio', wav,
             '--outfile', out,
             '--resize_factor', '2',
-            '--nosmooth'
+            '--nosmooth',
+            '--face_det_batch_size', '4',
+            '--wav2lip_batch_size', '32',
         ], capture_output=True, text=True, timeout=1800, cwd='/app')
 
         if result.returncode == 0 and os.path.exists(out):
             jobs[job_id] = {"status": "succeeded", "video_path": out}
         else:
-            jobs[job_id] = {"status": "failed", "error": result.stderr[-500:]}
+            jobs[job_id] = {"status": "failed", "error": result.stderr[-2000:] + result.stdout[-500:]}
     except Exception as e:
         jobs[job_id] = {"status": "failed", "error": str(e)}
 
