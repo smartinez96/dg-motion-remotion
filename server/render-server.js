@@ -35,6 +35,12 @@ async function getBundle() {
   return bundleLocation;
 }
 
+const BROWSER_EXECUTABLE = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+const CHROMIUM_OPTIONS = {
+  disableWebSecurity: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+};
+
 const COMP_MAP = {
   stats: 'DG-Stats',
   intro: 'DG-Intro',
@@ -121,6 +127,8 @@ app.post('/render', async (req, res) => {
       serveUrl,
       id: compositionId,
       inputProps,
+      browserExecutable: BROWSER_EXECUTABLE,
+      chromiumOptions: CHROMIUM_OPTIONS,
     });
 
     if (durationOverride) {
@@ -133,9 +141,8 @@ app.post('/render', async (req, res) => {
       codec: 'h264',
       outputLocation: outputPath,
       inputProps,
-      chromiumOptions: {
-        disableWebSecurity: true,
-      },
+      browserExecutable: BROWSER_EXECUTABLE,
+      chromiumOptions: CHROMIUM_OPTIONS,
     });
 
     const videoUrl = `${PUBLIC_BASE_URL}/output/${filename}`;
@@ -184,6 +191,8 @@ app.post('/render-avatar', async (req, res) => {
         serveUrl,
         id: 'DG-AvatarCaptions',
         inputProps,
+        browserExecutable: BROWSER_EXECUTABLE,
+        chromiumOptions: CHROMIUM_OPTIONS,
       });
       composition.durationInFrames = durationInFrames;
 
@@ -196,7 +205,8 @@ app.post('/render-avatar', async (req, res) => {
         codec: 'h264',
         outputLocation: outputPath,
         inputProps,
-        chromiumOptions: { disableWebSecurity: true },
+        browserExecutable: BROWSER_EXECUTABLE,
+        chromiumOptions: CHROMIUM_OPTIONS,
       });
 
       const videoUrl = `${PUBLIC_BASE_URL}/output/${filename}`;
