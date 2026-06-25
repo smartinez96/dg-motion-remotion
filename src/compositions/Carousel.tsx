@@ -28,6 +28,15 @@ const SlideScene: React.FC<{
   });
   const opacity = Math.min(fadeIn, fadeOut);
 
+  const scaleIn = interpolate(frame, [0, 16], [1.04, 1.0], {
+    extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const translateIn = interpolate(frame, [0, 16], [12, 0], {
+    extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+
   return (
     <AbsoluteFill
       style={{
@@ -39,6 +48,7 @@ const SlideScene: React.FC<{
         paddingTop: 120,
         paddingBottom: 120,
         opacity,
+        transform: `scale(${scaleIn}) translateY(${translateIn}px)`,
       }}
     >
       {/* Progress bar */}

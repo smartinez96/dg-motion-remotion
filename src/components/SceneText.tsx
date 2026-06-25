@@ -1,3 +1,4 @@
+import React from 'react';
 import { AbsoluteFill, useCurrentFrame, interpolate, Easing } from 'remotion';
 import { COLORS } from '../fonts';
 
@@ -264,8 +265,10 @@ export const RichText: React.FC<{
               <span
                 style={{
                   color: seg.o ? COLORS.orange : COLORS.primary,
+                  fontSize: seg.o ? `${Math.round(baseFontSize * 1.12)}px` : undefined,
+                  fontWeight: seg.o ? 900 : undefined,
                   textShadow: seg.o
-                    ? '0 0 28px rgba(232,119,34,0.65), 0 0 56px rgba(232,119,34,0.3)'
+                    ? '0 0 32px rgba(232,119,34,0.70), 0 0 64px rgba(232,119,34,0.35)'
                     : undefined,
                 }}
               >

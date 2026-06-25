@@ -1,25 +1,70 @@
-import { AbsoluteFill, Sequence, useVideoConfig, useCurrentFrame, interpolate, Easing } from 'remotion';
+import {
+  AbsoluteFill,
+  Sequence,
+  useVideoConfig,
+  useCurrentFrame,
+  interpolate,
+  Easing,
+} from 'remotion';
 import { Background } from '../components/Background';
-import { SceneText, AccentLine, Badge, FlashIn, RichText } from '../components/SceneText';
+import { AccentLine, Badge, FlashIn, RichText, SceneText } from '../components/SceneText';
 import { LogoScreen } from '../components/LogoScreen';
+import { SceneEnter } from '../components/SceneEnter';
+import { ChatMockupBg } from '../components/ChatMockupBg';
+import { CheckCircleBg } from '../components/CheckCircleBg';
 import { COLORS, fontFamily } from '../fonts';
 import type { FullProps } from '../types';
 
 const SAFE_X = 80;
 
-const SceneFade: React.FC<{ children: React.ReactNode; durationInFrames: number }> = ({
-  children, durationInFrames,
-}) => {
+// Orange particle burst — replaces white flash for step scene transitions
+const ParticleBurst: React.FC = () => {
   const frame = useCurrentFrame();
-  const fadeOut = interpolate(frame, [durationInFrames - 10, durationInFrames], [1, 0], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  if (frame > 10) return null;
+
+  const BURSTS = [
+    { angle: 0, dist: 140 }, { angle: 45, dist: 115 }, { angle: 90, dist: 130 },
+    { angle: 135, dist: 155 }, { angle: 180, dist: 140 }, { angle: 225, dist: 110 },
+    { angle: 270, dist: 135 }, { angle: 315, dist: 120 },
+  ];
+
+  const progress = interpolate(frame, [0, 10], [0, 1], {
+    extrapolateRight: 'clamp',
+    easing: Easing.out(Easing.quad),
   });
+  const opacity = interpolate(frame, [3, 10], [0.7, 0], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
   return (
-    <div style={{ opacity: fadeOut, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {children}
-    </div>
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      {BURSTS.map((b, i) => {
+        const rad = (b.angle * Math.PI) / 180;
+        const x = 540 + Math.cos(rad) * b.dist * progress;
+        const y = 960 + Math.sin(rad) * b.dist * progress;
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: x - 5,
+              top: y - 5,
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              backgroundColor: COLORS.orange,
+              opacity,
+              boxShadow: `0 0 10px rgba(232,119,34,0.9)`,
+            }}
+          />
+        );
+      })}
+    </AbsoluteFill>
   );
 };
+
+type VisualElement = 'chat' | 'check' | null;
 
 const StepScene: React.FC<{
   step: number;
@@ -27,7 +72,8 @@ const StepScene: React.FC<{
   isHighlight: boolean;
   durationInFrames: number;
   flash?: boolean;
-}> = ({ step, text, isHighlight, durationInFrames, flash }) => {
+  visualElement?: VisualElement;
+}> = ({ step, text, isHighlight, durationInFrames, flash, visualElement }) => {
   const frame = useCurrentFrame();
 
   const numOpacity = interpolate(frame, [0, 14], [0, 1], {
@@ -52,9 +98,11 @@ const StepScene: React.FC<{
         paddingRight: SAFE_X,
       }}
     >
-      <SceneFade durationInFrames={durationInFrames}>
+      {visualElement === 'chat' && <ChatMockupBg delay={8} />}
+      {visualElement === 'check' && <CheckCircleBg delay={8} />}
+
+      <SceneEnter durationInFrames={durationInFrames}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
-          {/* Step number badge */}
           <div
             style={{
               opacity: numOpacity,
@@ -70,7 +118,9 @@ const StepScene: React.FC<{
               fontWeight: 800,
               color: isHighlight ? COLORS.orange : 'rgba(255,255,255,0.5)',
               backgroundColor: isHighlight ? 'rgba(232,119,34,0.12)' : 'rgba(255,255,255,0.04)',
-              boxShadow: isHighlight ? `0 0 ${18 + glow * 12}px rgba(232,119,34,${0.2 + glow * 0.2})` : 'none',
+              boxShadow: isHighlight
+                ? `0 0 ${18 + glow * 12}px rgba(232,119,34,${0.2 + glow * 0.2})`
+                : 'none',
             }}
           >
             {step}
@@ -83,14 +133,15 @@ const StepScene: React.FC<{
             delay={12}
             textAlign="center"
             lineHeight={1.25}
-            textShadow={isHighlight
-              ? `0 0 28px rgba(232,119,34,0.6), 0 0 56px rgba(232,119,34,0.3)`
-              : undefined
+            textShadow={
+              isHighlight
+                ? `0 0 28px rgba(232,119,34,0.6), 0 0 56px rgba(232,119,34,0.3)`
+                : undefined
             }
           />
         </div>
-      </SceneFade>
-      {flash && <FlashIn />}
+      </SceneEnter>
+      {flash && <ParticleBurst />}
     </AbsoluteFill>
   );
 };
@@ -127,33 +178,36 @@ export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4
             justifyContent: 'center',
             paddingLeft: SAFE_X,
             paddingRight: SAFE_X,
-            gap: 36,
           }}
         >
-          <Badge text="EL ERROR MÁS COMÚN" delay={0} />
-          <RichText
-            text={hook}
-            baseFontSize={68}
-            baseWeight={800}
-            delay={12}
-            textAlign="center"
-            lineHeight={1.18}
-          />
-          <AccentLine delay={28} width={90} />
+          <SceneEnter durationInFrames={hookDuration}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
+              <Badge text="EL ERROR MÁS COMÚN" delay={0} />
+              <RichText
+                text={hook}
+                baseFontSize={68}
+                baseWeight={800}
+                delay={12}
+                textAlign="center"
+                lineHeight={1.18}
+              />
+              <AccentLine delay={28} width={90} />
+            </div>
+          </SceneEnter>
         </AbsoluteFill>
       </Sequence>
 
       <Sequence from={s1Start} durationInFrames={sceneDuration}>
-        <StepScene step={1} text={scene1} isHighlight={false} durationInFrames={sceneDuration} flash />
+        <StepScene step={1} text={scene1} isHighlight={false} durationInFrames={sceneDuration} flash visualElement="chat" />
       </Sequence>
       <Sequence from={s2Start} durationInFrames={sceneDuration}>
-        <StepScene step={2} text={scene2} isHighlight={false} durationInFrames={sceneDuration} flash />
+        <StepScene step={2} text={scene2} isHighlight={false} durationInFrames={sceneDuration} flash visualElement="chat" />
       </Sequence>
       <Sequence from={s3Start} durationInFrames={sceneDuration}>
-        <StepScene step={3} text={scene3} isHighlight={true} durationInFrames={sceneDuration} flash />
+        <StepScene step={3} text={scene3} isHighlight durationInFrames={sceneDuration} flash visualElement="check" />
       </Sequence>
       <Sequence from={s4Start} durationInFrames={sceneDuration}>
-        <StepScene step={4} text={scene4} isHighlight={false} durationInFrames={sceneDuration} flash />
+        <StepScene step={4} text={scene4} isHighlight={false} durationInFrames={sceneDuration} flash visualElement="check" />
       </Sequence>
 
       {/* CTA */}
@@ -166,34 +220,37 @@ export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4
             justifyContent: 'center',
             paddingLeft: SAFE_X,
             paddingRight: SAFE_X,
-            gap: 36,
           }}
         >
-          <Badge text="LA SOLUCIÓN" delay={0} />
-          <RichText
-            text={cta}
-            baseFontSize={64}
-            baseWeight={800}
-            delay={12}
-            textAlign="center"
-            lineHeight={1.25}
-          />
-          <div
-            style={{
-              marginTop: 8,
-              padding: '16px 40px',
-              borderRadius: 100,
-              border: `1.5px solid rgba(232,119,34,${0.4 + ctaGlow * 0.35})`,
-              backgroundColor: 'rgba(232,119,34,0.10)',
-              boxShadow: `0 0 ${16 + ctaGlow * 10}px rgba(232,119,34,${0.13 + ctaGlow * 0.10})`,
-              fontSize: 22,
-              fontWeight: 700,
-              color: COLORS.orange,
-              letterSpacing: 2,
-            }}
-          >
-            @DIGITALGROWTH.WR
-          </div>
+          <SceneEnter durationInFrames={ctaDuration}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
+              <Badge text="LA SOLUCIÓN" delay={0} />
+              <RichText
+                text={cta}
+                baseFontSize={64}
+                baseWeight={800}
+                delay={12}
+                textAlign="center"
+                lineHeight={1.25}
+              />
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: '16px 40px',
+                  borderRadius: 100,
+                  border: `1.5px solid rgba(232,119,34,${0.4 + ctaGlow * 0.35})`,
+                  backgroundColor: 'rgba(232,119,34,0.10)',
+                  boxShadow: `0 0 ${16 + ctaGlow * 10}px rgba(232,119,34,${0.13 + ctaGlow * 0.10})`,
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: COLORS.orange,
+                  letterSpacing: 2,
+                }}
+              >
+                @DIGITALGROWTH.WR
+              </div>
+            </div>
+          </SceneEnter>
           <FlashIn />
         </AbsoluteFill>
       </Sequence>

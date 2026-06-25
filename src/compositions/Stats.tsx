@@ -7,61 +7,49 @@ import {
   Easing,
 } from 'remotion';
 import { Background } from '../components/Background';
-import { SceneText, AccentLine, Badge, FlashIn, RichText } from '../components/SceneText';
+import { AccentLine, Badge, FlashIn, RichText } from '../components/SceneText';
 import { StatCounter } from '../components/StatCounter';
 import { LogoScreen } from '../components/LogoScreen';
+import { SceneEnter } from '../components/SceneEnter';
+import { ChatMockupBg } from '../components/ChatMockupBg';
 import { COLORS, fontFamily } from '../fonts';
 import type { StatsProps } from '../types';
 
 const SAFE_X = 80;
 
-const SceneFade: React.FC<{ children: React.ReactNode; durationInFrames: number }> = ({
-  children,
+const HookScene: React.FC<{ text: string; durationInFrames: number; flash?: boolean }> = ({
+  text,
   durationInFrames,
-}) => {
-  const frame = useCurrentFrame();
-  const fadeOut = interpolate(frame, [durationInFrames - 12, durationInFrames], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  return (
-    <div style={{ opacity: fadeOut, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {children}
-    </div>
-  );
-};
-
-const HookScene: React.FC<{ text: string; durationInFrames: number; flash?: boolean }> = ({ text, durationInFrames, flash }) => {
-  return (
-    <AbsoluteFill
-      style={{
-        fontFamily,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingLeft: SAFE_X,
-        paddingRight: SAFE_X,
-      }}
-    >
-      <SceneFade durationInFrames={durationInFrames}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text="AUTOMATIZACIÓN IA" delay={0} />
-          <RichText
-            text={text}
-            baseFontSize={72}
-            baseWeight={800}
-            delay={12}
-            textAlign="center"
-            lineHeight={1.15}
-          />
-          <AccentLine delay={28} width={80} />
-        </div>
-      </SceneFade>
-      {flash && <FlashIn />}
-    </AbsoluteFill>
-  );
-};
+  flash,
+}) => (
+  <AbsoluteFill
+    style={{
+      fontFamily,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingLeft: SAFE_X,
+      paddingRight: SAFE_X,
+    }}
+  >
+    <SceneEnter durationInFrames={durationInFrames}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
+        <Badge text="AUTOMATIZACIÓN IA" delay={0} />
+        <RichText
+          text={text}
+          baseFontSize={72}
+          baseWeight={800}
+          delay={12}
+          textAlign="center"
+          lineHeight={1.15}
+        />
+        <AccentLine delay={28} width={80} />
+      </div>
+    </SceneEnter>
+    {flash && <FlashIn />}
+  </AbsoluteFill>
+);
 
 const StatScene: React.FC<{
   number: string;
@@ -69,64 +57,69 @@ const StatScene: React.FC<{
   badge: string;
   durationInFrames: number;
   flash?: boolean;
-}> = ({ number, label, badge, durationInFrames, flash }) => {
-  return (
-    <AbsoluteFill
-      style={{
-        fontFamily,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingLeft: SAFE_X,
-        paddingRight: SAFE_X,
-      }}
-    >
-      <SceneFade durationInFrames={durationInFrames}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
-          <Badge text={badge} delay={0} />
-          <StatCounter number={number} label={label} delay={8} />
-        </div>
-      </SceneFade>
-      {flash && <FlashIn />}
-    </AbsoluteFill>
-  );
-};
+}> = ({ number, label, badge, durationInFrames, flash }) => (
+  <AbsoluteFill
+    style={{
+      fontFamily,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingLeft: SAFE_X,
+      paddingRight: SAFE_X,
+    }}
+  >
+    <SceneEnter durationInFrames={durationInFrames}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
+        <Badge text={badge} delay={0} />
+        <StatCounter number={number} label={label} delay={8} />
+      </div>
+    </SceneEnter>
+    {flash && <FlashIn />}
+  </AbsoluteFill>
+);
 
-const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: number; flash?: boolean }> = ({ text, badge, durationInFrames, flash }) => {
-  return (
-    <AbsoluteFill
-      style={{
-        fontFamily,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingLeft: SAFE_X,
-        paddingRight: SAFE_X,
-      }}
-    >
-      <SceneFade durationInFrames={durationInFrames}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
-          <RichText
-            text={text}
-            baseFontSize={52}
-            baseWeight={700}
-            delay={12}
-            textAlign="center"
-            lineHeight={1.3}
-          />
-        </div>
-      </SceneFade>
-      {flash && <FlashIn />}
-    </AbsoluteFill>
-  );
-};
+const InsightScene: React.FC<{
+  text: string;
+  badge?: string;
+  durationInFrames: number;
+  flash?: boolean;
+}> = ({ text, badge, durationInFrames, flash }) => (
+  <AbsoluteFill
+    style={{
+      fontFamily,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingLeft: SAFE_X,
+      paddingRight: SAFE_X,
+    }}
+  >
+    <ChatMockupBg delay={6} />
+    <SceneEnter durationInFrames={durationInFrames}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
+        <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
+        <RichText
+          text={text}
+          baseFontSize={52}
+          baseWeight={700}
+          delay={12}
+          textAlign="center"
+          lineHeight={1.3}
+        />
+      </div>
+    </SceneEnter>
+    {flash && <FlashIn />}
+  </AbsoluteFill>
+);
 
-const CtaScene: React.FC<{ text: string; durationInFrames: number; flash?: boolean }> = ({ text, durationInFrames, flash }) => {
+const CtaScene: React.FC<{ text: string; durationInFrames: number; flash?: boolean }> = ({
+  text,
+  durationInFrames,
+  flash,
+}) => {
   const frame = useCurrentFrame();
-
   const pillOpacity = interpolate(frame, [22, 36], [0, 1], {
     extrapolateRight: 'clamp',
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -149,7 +142,7 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number; flash?: boole
         paddingRight: SAFE_X,
       }}
     >
-      <SceneFade durationInFrames={durationInFrames}>
+      <SceneEnter durationInFrames={durationInFrames}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
           <Badge text="¿LISTO PARA CRECER?" delay={0} />
           <RichText
@@ -176,7 +169,7 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number; flash?: boole
             </div>
           </div>
         </div>
-      </SceneFade>
+      </SceneEnter>
       {flash && <FlashIn />}
     </AbsoluteFill>
   );

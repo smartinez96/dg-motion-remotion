@@ -1,4 +1,5 @@
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { DiagonalStreaks } from './DiagonalStreaks';
 
 const PARTICLES = [
   { x: 8,  baseY: 300,  speed: 0.28, size: 2,   opacity: 0.35, delay: 0   },
@@ -57,7 +58,7 @@ export const Background: React.FC = () => {
           width: 760,
           height: 760,
           borderRadius: '50%',
-          background: `radial-gradient(circle, rgba(232,119,34,${0.09 + breathe * 0.04}) 0%, rgba(180,65,15,0.04) 45%, transparent 70%)`,
+          background: `radial-gradient(circle, rgba(232,119,34,${0.09 + breathe * 0.07}) 0%, rgba(180,65,15,0.04) 45%, transparent 70%)`,
           filter: 'blur(55px)',
           pointerEvents: 'none',
         }}
@@ -99,6 +100,8 @@ export const Background: React.FC = () => {
         </filter>
         <rect width="100%" height="100%" filter={`url(#${filterId})`} fill="white" />
       </svg>
+
+      <DiagonalStreaks />
     </AbsoluteFill>
   );
 };

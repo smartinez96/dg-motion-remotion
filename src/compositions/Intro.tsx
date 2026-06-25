@@ -11,24 +11,12 @@ import {
 import { Background } from '../components/Background';
 import { SceneText, AccentLine, Badge, FeaturePill, FlashIn, RichText } from '../components/SceneText';
 import { LogoScreen } from '../components/LogoScreen';
+import { SceneEnter } from '../components/SceneEnter';
 import { COLORS, fontFamily } from '../fonts';
 import type { IntroProps } from '../types';
 
 const SAFE_X = 80;
 
-const SceneFade: React.FC<{ children: React.ReactNode; durationInFrames: number }> = ({
-  children, durationInFrames,
-}) => {
-  const frame = useCurrentFrame();
-  const fadeOut = interpolate(frame, [durationInFrames - 12, durationInFrames], [1, 0], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-  });
-  return (
-    <div style={{ opacity: fadeOut, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {children}
-    </div>
-  );
-};
 
 const SERVICES = [
   { icon: '🤖', text: 'Agente WhatsApp 24/7',     delay: 18 },
@@ -64,7 +52,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
 
       {/* Scene 1: Brand reveal */}
       <Sequence from={0} durationInFrames={s1Duration}>
-        <SceneFade durationInFrames={s1Duration}>
+        <SceneEnter durationInFrames={s1Duration}>
           <AbsoluteFill
             style={{
               display: 'flex',
@@ -98,7 +86,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
             />
             <AccentLine delay={32} width={100} />
           </AbsoluteFill>
-        </SceneFade>
+        </SceneEnter>
       </Sequence>
 
       {/* Scene 2: Services pills */}
@@ -112,7 +100,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
             paddingRight: SAFE_X,
           }}
         >
-          <SceneFade durationInFrames={s2Duration}>
+          <SceneEnter durationInFrames={s2Duration}>
             <AbsoluteFill
               style={{
                 display: 'flex',
@@ -138,7 +126,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
                 ))}
               </div>
             </AbsoluteFill>
-          </SceneFade>
+          </SceneEnter>
           <FlashIn />
         </AbsoluteFill>
       </Sequence>
@@ -155,7 +143,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
             paddingRight: SAFE_X,
           }}
         >
-          <SceneFade durationInFrames={s3Duration}>
+          <SceneEnter durationInFrames={s3Duration}>
             <AbsoluteFill
               style={{
                 display: 'flex',
@@ -178,7 +166,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
               />
               <CtaPill delay={26} />
             </AbsoluteFill>
-          </SceneFade>
+          </SceneEnter>
           <FlashIn />
         </AbsoluteFill>
       </Sequence>
