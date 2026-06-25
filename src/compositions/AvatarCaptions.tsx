@@ -7,63 +7,63 @@ import {
   interpolate,
   Easing,
 } from 'remotion';
-import { fontFamily, COLORS } from '../fonts';
+import { fontFamily } from '../fonts';
 import { LogoScreen } from '../components/LogoScreen';
 import type { AvatarCaptionsProps } from '../types';
 
 const FPS = 30;
 const OUTRO_SECS = 4;
+const NEON = '#FF6200';
 
 const POWER_WORDS = [
-  'IA', 'WhatsApp', 'gratis', 'clientes', 'negocios',
-  'automatiza', 'pierde', 'gana', 'ventas', 'dinero',
-  'negocio', 'automatizacion', 'robots', 'inteligencia',
+  'ia', 'clientes', 'negocios', 'negocio', 'ventas', 'dinero',
+  'automatiza', 'automatizacion', 'pierde', 'gana', 'gratis',
+  'whatsapp', 'chatbot', 'agente', 'sistema', 'sistemas',
+  'noche', 'primero', 'primeros', 'oportunidad', 'error', 'errores',
+  'clave', 'claves', 'inteligencia', 'robots', 'cierras',
 ];
 
-function hasPowerWord(text: string): boolean {
-  return POWER_WORDS.some((pw) => text.toLowerCase().includes(pw.toLowerCase()));
+function isPower(word: string): boolean {
+  const clean = word.toLowerCase().replace(/[^a-záéíóúñü]/g, '');
+  return POWER_WORDS.includes(clean);
 }
 
-const CaptionPill: React.FC<{ text: string; isPower: boolean }> = ({ text, isPower }) => {
+const Caption: React.FC<{ text: string }> = ({ text }) => {
   const frame = useCurrentFrame();
-
-  const opacity = interpolate(frame, [0, 4], [0, 1], {
+  const opacity = interpolate(frame, [0, 5], [0, 1], {
     extrapolateRight: 'clamp',
     easing: Easing.out(Easing.quad),
   });
 
-  const scale = interpolate(frame, [0, 7], [0.93, 1], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
   return (
-    <div style={{ opacity, transform: `scale(${scale})` }}>
-      <div
-        style={{
-          backgroundColor: isPower ? COLORS.orange : 'rgba(0,0,0,0.78)',
-          borderRadius: 14,
-          padding: '12px 30px',
-          maxWidth: 920,
-          textAlign: 'center',
-          boxShadow: isPower
-            ? '0 4px 24px rgba(232,119,34,0.45)'
-            : '0 4px 16px rgba(0,0,0,0.6)',
-        }}
-      >
+    <div
+      style={{
+        opacity,
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        columnGap: 10,
+        rowGap: 4,
+      }}
+    >
+      {text.split(' ').map((word, i) => (
         <span
+          key={i}
           style={{
             fontFamily,
-            fontSize: 52,
-            fontWeight: 800,
-            color: '#FFFFFF',
-            lineHeight: 1.15,
-            wordBreak: 'break-word',
+            fontSize: 62,
+            fontWeight: 900,
+            lineHeight: 1.18,
+            color: isPower(word) ? NEON : '#FFFFFF',
+            textShadow: isPower(word)
+              ? `0 0 24px rgba(255,98,0,0.85), 0 2px 18px rgba(0,0,0,0.98)`
+              : '0 2px 18px rgba(0,0,0,0.98)',
+            letterSpacing: '-0.3px',
           }}
         >
-          {text}
+          {word}
         </span>
-      </div>
+      ))}
     </div>
   );
 };
@@ -78,7 +78,7 @@ export const AvatarCaptions: React.FC<AvatarCaptionsProps> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000000', fontFamily }}>
-      {/* Avatar video background */}
+      {/* Avatar video */}
       <Sequence from={0} durationInFrames={audioFrames}>
         <AbsoluteFill>
           <Video
@@ -88,59 +88,69 @@ export const AvatarCaptions: React.FC<AvatarCaptionsProps> = ({
         </AbsoluteFill>
       </Sequence>
 
-      {/* Karaoke caption groups */}
+      {/* Gradient bottom — legibilidad sin caja */}
+      <Sequence from={0} durationInFrames={audioFrames}>
+        <AbsoluteFill
+          style={{
+            background:
+              'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.0) 38%)',
+          }}
+        />
+      </Sequence>
+
+      {/* Captions al fondo, sin recuadro */}
       {groups.map((group, i) => {
         const fromFrame = Math.max(0, Math.round(group.start * FPS));
-        const durationFrames = Math.max(Math.round((group.end - group.start) * FPS), 5);
-        const isPower = hasPowerWord(group.text);
+        const durationFrames = Math.max(
+          Math.round((group.end - group.start) * FPS),
+          5,
+        );
 
         return (
           <Sequence key={i} from={fromFrame} durationInFrames={durationFrames}>
             <AbsoluteFill
               style={{
                 display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'center',
-                paddingBottom: 240,
-                paddingLeft: 64,
-                paddingRight: 64,
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingBottom: 148,
+                paddingLeft: 48,
+                paddingRight: 48,
               }}
             >
-              <CaptionPill text={group.text} isPower={isPower} />
+              <Caption text={group.text} />
             </AbsoluteFill>
           </Sequence>
         );
       })}
 
-      {/* Handle @digitalgrowth.wr */}
+      {/* Handle centrado al fondo */}
       <Sequence from={0} durationInFrames={audioFrames}>
         <AbsoluteFill
           style={{
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'center',
-            paddingBottom: 100,
+            paddingBottom: 64,
           }}
         >
-          <div
+          <span
             style={{
               fontFamily,
-              fontSize: 26,
-              fontWeight: 700,
-              color: 'rgba(255,255,255,0.9)',
-              letterSpacing: 1,
-              textShadow: '0 1px 8px rgba(0,0,0,0.9)',
-              backgroundColor: 'rgba(0,0,0,0.45)',
-              padding: '8px 22px',
-              borderRadius: 8,
+              fontSize: 28,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.80)',
+              letterSpacing: 2,
+              textShadow: '0 1px 14px rgba(0,0,0,0.98)',
             }}
           >
             @digitalgrowth.wr
-          </div>
+          </span>
         </AbsoluteFill>
       </Sequence>
 
-      {/* Outro logo screen */}
+      {/* Outro */}
       <Sequence from={audioFrames} durationInFrames={outroFrames}>
         <LogoScreen />
       </Sequence>
