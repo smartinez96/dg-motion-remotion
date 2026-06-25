@@ -125,22 +125,20 @@ export const AvatarCaptions: React.FC<AvatarCaptionsProps> = ({
         );
       })}
 
-      {/* Handle centrado al fondo */}
+      {/* Handle centrado al fondo — posición absoluta explícita */}
       <Sequence from={0} durationInFrames={audioFrames}>
-        <AbsoluteFill
-          style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            paddingBottom: 64,
-          }}
-        >
+        <AbsoluteFill>
           <span
             style={{
+              position: 'absolute',
+              bottom: 64,
+              left: 0,
+              right: 0,
+              textAlign: 'center',
               fontFamily,
-              fontSize: 28,
+              fontSize: 30,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.80)',
+              color: 'rgba(255,255,255,0.85)',
               letterSpacing: 2,
               textShadow: '0 1px 14px rgba(0,0,0,0.98)',
             }}
