@@ -70,7 +70,7 @@ const StatScene: React.FC<{
   const badgeOpacity = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
 
   return (
-    <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 44, gap: 24 }}>
+    <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 30, paddingTop: 130, paddingBottom: 130, gap: 28 }}>
       <PhoneGlow />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -92,7 +92,7 @@ const StatScene: React.FC<{
         </div>
       </div>
 
-      <PhoneMockup delay={6} tiltY={-13} width={330}>
+      <PhoneMockup delay={6} tiltY={-12} width={430}>
         {phoneType === 'unanswered' ? <WhatsAppUnanswered /> : <GrowthAnalyticsScreen mode="growth" />}
       </PhoneMockup>
     </AbsoluteFill>
@@ -102,14 +102,14 @@ const StatScene: React.FC<{
 // ─── Insight: split layout + WhatsApp auto ────────────────────────────────────
 
 const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: number }> = ({ text, badge, durationInFrames }) => (
-  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 44, gap: 24 }}>
+  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 30, paddingTop: 130, paddingBottom: 130, gap: 28 }}>
     <PhoneGlow />
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
       <AccentLine delay={0} width={52} />
       <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
       <RichText text={text} baseFontSize={48} baseWeight={700} delay={12} textAlign="left" lineHeight={1.25} />
     </div>
-    <PhoneMockup delay={8} tiltY={-13} width={330}>
+    <PhoneMockup delay={8} tiltY={-12} width={430}>
       <WhatsAppAutoReply />
     </PhoneMockup>
   </AbsoluteFill>

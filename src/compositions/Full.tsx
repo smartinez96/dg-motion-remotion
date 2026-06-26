@@ -89,7 +89,7 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
   const variant = PHONE_BY_STEP[step - 1] ?? 'unanswered';
 
   return (
-    <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 40, gap: 22 }}>
+    <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 30, paddingTop: 130, paddingBottom: 130, gap: 28 }}>
       <PhoneGlow accent={isHighlight} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 26 }}>
         <div style={{
@@ -109,7 +109,7 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
           textShadow={isHighlight ? '0 0 32px rgba(255,107,26,0.55)' : undefined}
         />
       </div>
-      <PhoneMockup delay={6} tiltY={-13} width={316}>
+      <PhoneMockup delay={6} tiltY={-12} width={430}>
         <PhoneContent variant={variant} />
       </PhoneMockup>
       {isHighlight && <ParticleBurst />}
