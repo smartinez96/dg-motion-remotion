@@ -2,6 +2,7 @@ import React from 'react';
 import { useCurrentFrame } from 'remotion';
 import { noise2D } from '@remotion/noise';
 import { TOKENS } from './tokens';
+import { useTheme } from '../ThemeContext';
 
 type Props = {
   children: React.ReactNode;
@@ -29,21 +30,32 @@ export const GlowText: React.FC<Props> = ({
   seed = 'glow',
 }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
 
-  // noise2D: aperiódico — nunca repite el mismo ciclo exacto (no es sin/cos)
   const raw   = noise2D(seed, frame / 90, 0);
-  const pulse = (raw + 1) / 2;                    // -1..1 → 0..1
-  const g     = intensity * (0.60 + pulse * 0.40); // 60-100% de intensity
+  const pulse = (raw + 1) / 2; // -1..1 → 0..1
 
-  const [r, gv, b] = hexToRgb(color);
-  const rgba = (a: number) => `rgba(${r},${gv},${b},${(g * a).toFixed(2)})`;
+  let textShadow: string;
 
-  const textShadow = [
-    `0 0  8px ${rgba(0.95)}`,   // núcleo apretado
-    `0 0 22px ${rgba(0.70)}`,   // bloom medio
-    `0 0 55px ${rgba(0.40)}`,   // glow amplio
-    `0 0 110px ${rgba(0.18)}`,  // atmósfera
-  ].join(', ');
+  if (theme.glowMode === 'shadow') {
+    // Light theme: sombra que se mueve sutilmente — simula luz cenital moviéndose
+    // No glow, no brillo — pura sensación de elevación del texto
+    const shadowY    = (2 + pulse * 5).toFixed(1);
+    const shadowBlur = (6 + pulse * 6).toFixed(1);
+    const shadowOp   = (0.08 + pulse * 0.10).toFixed(2);
+    textShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOp})`;
+  } else {
+    // Dark theme: glow naranja multicapa
+    const g = intensity * (0.60 + pulse * 0.40);
+    const [r, gv, b] = hexToRgb(color);
+    const rgba = (a: number) => `rgba(${r},${gv},${b},${(g * a).toFixed(2)})`;
+    textShadow = [
+      `0 0  8px ${rgba(0.95)}`,
+      `0 0 22px ${rgba(0.70)}`,
+      `0 0 55px ${rgba(0.40)}`,
+      `0 0 110px ${rgba(0.18)}`,
+    ].join(', ');
+  }
 
   return (
     <span style={{ color, fontWeight, fontSize, textShadow }}>

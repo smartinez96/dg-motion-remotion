@@ -1,8 +1,12 @@
+import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame, interpolate, Easing } from 'remotion';
 import { COLORS, fontFamily } from '../fonts';
+import { useTheme } from '../ThemeContext';
 
 export const LogoScreen: React.FC = () => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
+  const isDark = theme.mode === 'dark';
 
   // Flash: white → transparent (dark bg appears from behind)
   const flashOpacity = interpolate(frame, [0, 12], [1, 0], {
@@ -64,29 +68,26 @@ export const LogoScreen: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* Dark background */}
-      <AbsoluteFill style={{ backgroundColor: COLORS.bg }} />
+      {/* Background */}
+      <AbsoluteFill style={{ backgroundColor: isDark ? COLORS.bg : theme.bgPrimary }} />
 
-      {/* Teal glow — top */}
-      <AbsoluteFill
-        style={{
-          background: 'radial-gradient(ellipse 65% 30% at 50% 0%, rgba(0,185,195,0.07) 0%, transparent 100%)',
-        }}
-      />
-
-      {/* Orange glow — bottom */}
-      <AbsoluteFill
-        style={{
-          background: 'radial-gradient(ellipse 55% 25% at 50% 100%, rgba(232,119,34,0.08) 0%, transparent 100%)',
-        }}
-      />
-
-      {/* Vignette */}
-      <AbsoluteFill
-        style={{
-          background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%)',
-        }}
-      />
+      {isDark ? (
+        <>
+          {/* DARK — Teal glow top */}
+          <AbsoluteFill style={{ background: 'radial-gradient(ellipse 65% 30% at 50% 0%, rgba(0,185,195,0.07) 0%, transparent 100%)' }} />
+          {/* DARK — Orange glow bottom */}
+          <AbsoluteFill style={{ background: 'radial-gradient(ellipse 55% 25% at 50% 100%, rgba(232,119,34,0.08) 0%, transparent 100%)' }} />
+          {/* DARK — Vignette */}
+          <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%)' }} />
+        </>
+      ) : (
+        <>
+          {/* LIGHT — Tinte cálido muy sutil arriba */}
+          <AbsoluteFill style={{ background: 'radial-gradient(ellipse 65% 30% at 50% 0%, rgba(200,220,255,0.06) 0%, transparent 100%)' }} />
+          {/* LIGHT — Viñeta muy sutil */}
+          <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 50%, rgba(0,0,0,0.05) 100%)' }} />
+        </>
+      )}
 
       {/* Content */}
       <AbsoluteFill
@@ -105,16 +106,18 @@ export const LogoScreen: React.FC = () => {
             opacity: logoOpacity,
             transform: `scale(${logoScale})`,
             marginBottom: 40,
-            filter: 'drop-shadow(0 0 40px rgba(232,119,34,0.18)) drop-shadow(0 0 12px rgba(255,255,255,0.08))',
+            filter: isDark
+              ? 'drop-shadow(0 0 40px rgba(232,119,34,0.18)) drop-shadow(0 0 12px rgba(255,255,255,0.08))'
+              : 'drop-shadow(0 6px 20px rgba(0,0,0,0.12)) drop-shadow(0 2px 6px rgba(0,0,0,0.08))',
           }}
         >
           <Img
-            src={staticFile('logo-full-white.png')}
+            src={staticFile(theme.logoFile)}
             style={{ width: 640, objectFit: 'contain' }}
           />
         </div>
 
-        {/* Orange divider — grows from center with pulse glow */}
+        {/* Orange divider — grows from center. Dark: glow pulsante. Light: sombra sutil */}
         <div
           style={{
             width: 120,
@@ -125,7 +128,9 @@ export const LogoScreen: React.FC = () => {
             transform: `scaleX(${lineScaleX})`,
             opacity: lineOpacity,
             marginBottom: 26,
-            boxShadow: `0 0 ${14 + glow * 10}px rgba(232,119,34,${0.5 + glow * 0.3}), 0 0 ${28 + glow * 16}px rgba(232,119,34,${0.2 + glow * 0.15})`,
+            boxShadow: isDark
+              ? `0 0 ${14 + glow * 10}px rgba(232,119,34,${0.5 + glow * 0.3}), 0 0 ${28 + glow * 16}px rgba(232,119,34,${0.2 + glow * 0.15})`
+              : `0 2px ${8 + glow * 4}px rgba(232,119,34,0.30)`,
           }}
         />
 
@@ -145,14 +150,14 @@ export const LogoScreen: React.FC = () => {
               height: 5,
               borderRadius: '50%',
               backgroundColor: COLORS.orange,
-              boxShadow: '0 0 6px rgba(232,119,34,0.9)',
+              boxShadow: isDark ? '0 0 6px rgba(232,119,34,0.9)' : '0 2px 4px rgba(232,119,34,0.35)',
             }}
           />
           <span
             style={{
               fontSize: 20,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.45)',
+              color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)',
               letterSpacing: 4,
               textTransform: 'uppercase',
             }}
@@ -165,7 +170,7 @@ export const LogoScreen: React.FC = () => {
               height: 5,
               borderRadius: '50%',
               backgroundColor: COLORS.orange,
-              boxShadow: '0 0 6px rgba(232,119,34,0.9)',
+              boxShadow: isDark ? '0 0 6px rgba(232,119,34,0.9)' : '0 2px 4px rgba(232,119,34,0.35)',
             }}
           />
         </div>

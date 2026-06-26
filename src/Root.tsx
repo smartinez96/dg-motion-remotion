@@ -5,6 +5,7 @@ import { Intro } from './compositions/Intro';
 import { Full } from './compositions/Full';
 import { Carousel } from './compositions/Carousel';
 import { AvatarCaptions } from './compositions/AvatarCaptions';
+import { LightPreview } from './compositions/LightPreview';
 
 
 const W = 1080;
@@ -92,6 +93,17 @@ export const RemotionRoot: React.FC = () => {
           groups: [],
           audioDurationSecs: 35,
         }}
+      />
+
+      {/* Light theme preview — validar contraste y sombras antes de propagar */}
+      <Composition
+        id="DG-LightPreview"
+        component={LightPreview}
+        durationInFrames={120}
+        fps={FPS}
+        width={W}
+        height={H}
+        defaultProps={{}}
       />
     </>
   );

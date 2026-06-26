@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCurrentFrame, interpolate, Easing } from 'remotion';
 import { TOKENS } from './tokens';
+import { useTheme } from '../ThemeContext';
 
 export type IconType = 'check' | 'clock' | 'chart' | 'message';
 export type BadgeVariant = 'subtle' | 'solid';
@@ -45,16 +46,22 @@ export const IconBadge: React.FC<Props> = ({
   const strokeDasharray  = len;
   const strokeDashoffset = len * (1 - drawProgress);
 
-  const bgColor    = variant === 'solid' ? TOKENS.accentPrimary : 'rgba(255,107,26,0.15)';
+  const theme = useTheme();
+  const bgColor    = variant === 'solid' ? TOKENS.accentPrimary : theme.iconBadgeSubtleBg;
   const iconColor  = variant === 'solid' ? TOKENS.textPrimary   : TOKENS.accentPrimary;
   const borderRadius = shape === 'circle' ? '50%' : `${Math.round(size * 0.26)}px`;
   const strokeW    = Math.max(2.5, size * 0.05);
+  // Light theme: sombra sutil debajo en lugar de glow alrededor
+  const boxShadow = theme.mode === 'light' && variant === 'subtle'
+    ? '0 4px 16px rgba(0,0,0,0.08)'
+    : 'none';
 
   return (
     <div style={{
       width: size, height: size, borderRadius,
       backgroundColor: bgColor,
-      border: variant === 'subtle' ? `1px solid ${TOKENS.bgCardBorder}` : 'none',
+      border: variant === 'subtle' ? `1px solid ${theme.iconBadgeBorder}` : 'none',
+      boxShadow,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       opacity: badgeOpacity,
       transform: `scale(${badgeScale})`,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCurrentFrame, interpolate, Easing, spring, useVideoConfig } from 'remotion';
-import { TOKENS } from './tokens';
+import { useTheme } from '../ThemeContext';
 
 export type ChatMessage = {
   text: string;
@@ -23,6 +23,7 @@ const Bubble: React.FC<{
 }> = ({ msg, startFrame }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const theme = useTheme();
   const lf = Math.max(0, frame - startFrame);
 
   const opacity = interpolate(lf, [0, 10], [0, 1], {
@@ -38,17 +39,17 @@ const Bubble: React.FC<{
   });
 
   const sent = msg.sent ?? false;
-  const bgColor   = sent ? 'rgba(255,107,26,0.13)' : TOKENS.bgCard;
+  const bgColor   = sent ? theme.chatBubbleSentBg  : theme.chatBubbleRecvBg;
   const border    = sent
-    ? '1px solid rgba(255,107,26,0.22)'
-    : `1px solid ${TOKENS.bgCardBorder}`;
-  const textColor = sent ? TOKENS.textPrimary : TOKENS.textSecondary;
+    ? `1px solid ${theme.chatBubbleSentBorder}`
+    : `1px solid ${theme.chatBubbleRecvBorder}`;
+  const textColor = sent ? theme.chatBubbleSentText : theme.chatBubbleRecvText;
 
   const check = msg.check ?? 'none';
   const checkEl = check === 'double'
     ? <span style={{ fontSize: 11, color: '#53bdeb', marginLeft: 5 }}>✓✓</span>
     : check === 'single'
-    ? <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)', marginLeft: 5 }}>✓</span>
+    ? <span style={{ fontSize: 11, color: theme.chatCheckSingle, marginLeft: 5 }}>✓</span>
     : null;
 
   return (
@@ -97,6 +98,7 @@ export const ChatMockup: React.FC<Props> = ({
   stagger = 14,
   width = 600,
 }) => {
+  const theme = useTheme();
   return (
     <div
       style={{
@@ -104,6 +106,10 @@ export const ChatMockup: React.FC<Props> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: 12,
+        backgroundColor: theme.chatContainerBg,
+        boxShadow: theme.chatContainerShadow,
+        borderRadius: theme.chatContainerBorderRadius,
+        padding: theme.chatContainerPadding,
       }}
     >
       {messages.map((msg, i) => (
