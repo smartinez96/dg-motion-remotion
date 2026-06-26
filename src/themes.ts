@@ -74,7 +74,7 @@ export const lightTheme: DGTheme = {
   textPrimary: '#0A0A0A',
   textSecondary: '#5A5A5A',
   glowMode: 'shadow',
-  logoFile: 'logo-full-black.png',
+  logoFile: 'logo-full-white.png',
   particleColorA: '#B0B0B0',
   particleColorB: '#C8C8C8',
   particleOpacityBase: 0.65,

@@ -9,7 +9,7 @@ import {
 } from 'remotion';
 import { TransitionSeries } from '@remotion/transitions';
 import { Background } from '../components/Background';
-import { AccentLine, Badge, RichText, SceneText } from '../components/SceneText';
+import { AccentLine, Badge, RichText } from '../components/SceneText';
 import { LogoScreen } from '../components/LogoScreen';
 import { SceneEnter } from '../components/SceneEnter';
 import { PhoneMockup } from '../components/PhoneMockup';
@@ -110,12 +110,9 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
           backgroundColor: circleBg,
           boxShadow: isHighlight ? `0 0 ${18 + glow * 14}px rgba(255,107,26,${0.22 + glow * 0.20})` : 'none',
         }}>{step}</div>
-        <SceneText
-          text={text} fontSize={50}
-          color={isHighlight ? TOKENS.accentPrimary : theme.textPrimary}
-          fontWeight={700} delay={14} textAlign="left" lineHeight={1.3}
-          textShadow={isHighlight ? '0 0 32px rgba(255,107,26,0.55)' : undefined}
-        />
+        <div style={isHighlight ? { filter: 'drop-shadow(0 0 18px rgba(255,107,26,0.40))' } : undefined}>
+          <RichText text={text} baseFontSize={50} baseWeight={700} delay={14} textAlign="left" lineHeight={1.3} />
+        </div>
       </div>
       <PhoneMockup delay={6} tiltY={-12} width={430}>
         <PhoneContent variant={variant} />
@@ -131,7 +128,7 @@ const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text,
   <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 40, paddingTop: 130, paddingBottom: 130, gap: 32 }}>
     {/* Izquierda: texto del hook */}
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 32 }}>
-      <Badge text="EL ERROR MAS COMUN" delay={0} />
+      <Badge text="EL ERROR MÁS COMÚN" delay={0} />
       <RichText text={text} baseFontSize={60} baseWeight={800} delay={10} textAlign="left" lineHeight={1.2} />
       <AccentLine delay={24} width={80} />
     </div>
@@ -157,7 +154,7 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
 
       <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
         <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text="LA SOLUCION" delay={0} />
+          <Badge text="LA SOLUCIÓN" delay={0} />
           <RichText text={text} baseFontSize={64} baseWeight={800} delay={12} textAlign="center" lineHeight={1.25} />
           <div style={{ marginTop: 8, padding: '16px 40px', borderRadius: 100, border: `1.5px solid rgba(255,107,26,${0.4 + glowPulse * 0.35})`, backgroundColor: 'rgba(255,107,26,0.10)', boxShadow: `0 0 ${16 + glowPulse * 10}px rgba(255,107,26,${0.13 + glowPulse * 0.10})`, fontSize: 22, fontWeight: 700, color: TOKENS.accentPrimary, letterSpacing: 2 }}>
             @DIGITALGROWTH.WR
@@ -173,9 +170,9 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
 export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4, cta, theme: themeName = 'dark' }) => {
   const { fps } = useVideoConfig();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
-  const hookDuration  = Math.round(3   * fps);
-  const sceneDuration = Math.round(2.5 * fps);
-  const ctaDuration   = Math.round(2.5 * fps);
+  const hookDuration  = Math.round(4.5 * fps);
+  const sceneDuration = Math.round(4   * fps);
+  const ctaDuration   = Math.round(4   * fps);
   const logoDuration  = Math.round(3.5 * fps);
 
   return (

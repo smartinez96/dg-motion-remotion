@@ -47,7 +47,7 @@ const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text,
 
     <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-        <Badge text="AUTOMATIZACION IA" delay={0} />
+        <Badge text="AUTOMATIZACIÓN IA" delay={0} />
         <RichText text={text} baseFontSize={72} baseWeight={800} delay={12} textAlign="center" lineHeight={1.15} />
         <AccentLine delay={28} width={80} />
       </div>
@@ -157,11 +157,11 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
   const { fps } = useVideoConfig();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
-  const s1  = Math.round(3   * fps);
-  const s2  = Math.round(3.5 * fps);
-  const s3  = Math.round(3.5 * fps);
-  const s4  = Math.round(3   * fps);
-  const s5  = Math.round(2.5 * fps);
+  const s1  = Math.round(4.5 * fps);
+  const s2  = Math.round(5   * fps);
+  const s3  = Math.round(5   * fps);
+  const s4  = Math.round(4.5 * fps);
+  const s5  = Math.round(4   * fps);
   const sLo = Math.round(3.5 * fps);
 
   return (

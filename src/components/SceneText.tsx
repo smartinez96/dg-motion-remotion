@@ -80,14 +80,14 @@ export const Badge: React.FC<{ text: string; delay?: number }> = ({ text, delay 
     <div style={{
       opacity, transform: `translateY(${translateY}px)`,
       display: 'inline-flex', alignItems: 'center', gap: 12,
-      padding: '13px 28px', borderRadius: 100,
-      backgroundColor: ACCENT_RGBA(0.10),
-      border: `1px solid ${ACCENT_RGBA(0.32)}`,
+      padding: '16px 36px', borderRadius: 100,
+      backgroundColor: ACCENT_RGBA(0.12),
+      border: `1.5px solid ${ACCENT_RGBA(0.40)}`,
       marginBottom: 14,
       boxShadow: badgeShadow,
     }}>
-      <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: dotShadow, flexShrink: 0 }} />
-      <span style={{ fontSize: 19, fontWeight: 700, lineHeight: 1, color: textColor, letterSpacing: 3, textTransform: 'uppercase' as const }}>
+      <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: dotShadow, flexShrink: 0 }} />
+      <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1, color: textColor, letterSpacing: 4, textTransform: 'uppercase' as const }}>
         {text}
       </span>
     </div>

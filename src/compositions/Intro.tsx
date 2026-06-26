@@ -58,9 +58,9 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta, theme:
   const frame   = useCurrentFrame();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
-  const s1 = Math.round(3   * fps);
-  const s2 = Math.round(3.5 * fps);
-  const s3 = Math.round(2.5 * fps);
+  const s1 = Math.round(4.5 * fps);
+  const s2 = Math.round(5   * fps);
+  const s3 = Math.round(4   * fps);
   const sL = Math.round(4   * fps);
 
   const bgIconOpacity = interpolate(frame, [0, 50], [0, 0.03], { extrapolateRight: 'clamp' });
