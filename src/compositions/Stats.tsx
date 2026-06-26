@@ -5,20 +5,36 @@ import {
   useCurrentFrame,
   interpolate,
   Easing,
+  spring,
 } from 'remotion';
 import { TransitionSeries, linearTiming } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
 import { Background } from '../components/Background';
 import { AccentLine, Badge, RichText } from '../components/SceneText';
-import { StatCounter } from '../components/StatCounter';
 import { LogoScreen } from '../components/LogoScreen';
 import { SceneEnter } from '../components/SceneEnter';
-import { ChatMockupBg } from '../components/ChatMockupBg';
+import { PhoneMockup } from '../components/PhoneMockup';
+import {
+  WhatsAppUnanswered,
+  GrowthAnalyticsScreen,
+  WhatsAppAutoReply,
+} from '../components/PhoneScreens';
 import { COLORS, fontFamily } from '../fonts';
 import type { StatsProps } from '../types';
 
 const SAFE_X = 80;
-const TRANS = 8; // cross-fade frames between scenes
+const TRANS = 8;
+
+// Ambient glow behind phone zone (right 55% of canvas)
+const PhoneGlow: React.FC = () => (
+  <div style={{
+    position: 'absolute', right: 0, top: 0, bottom: 0, width: '55%',
+    background: 'radial-gradient(ellipse at 85% 50%, rgba(232,119,34,0.07) 0%, transparent 55%)',
+    pointerEvents: 'none',
+  }} />
+);
+
+// ─── Hook: full-width ────────────────────────────────────────────────────────
 
 const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => (
   <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
@@ -32,28 +48,77 @@ const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text,
   </AbsoluteFill>
 );
 
-const StatScene: React.FC<{ number: string; label: string; badge: string; durationInFrames: number }> = ({ number, label, badge, durationInFrames }) => (
-  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
-    <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
-        <Badge text={badge} delay={0} />
-        <StatCounter number={number} label={label} delay={8} />
+// ─── Stat: split layout — número a la izquierda, phone a la derecha ──────────
+
+const StatScene: React.FC<{
+  number: string;
+  label: string;
+  badge: string;
+  durationInFrames: number;
+  phoneType: 'unanswered' | 'growth';
+}> = ({ number, label, badge, durationInFrames, phoneType }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const numOpacity = interpolate(frame, [0, 18], [0, 1], { extrapolateRight: 'clamp' });
+  const numY = spring({ frame, fps, config: { damping: 14, stiffness: 90, mass: 0.9 }, from: 40, to: 0 });
+  const badgeOpacity = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
+
+  return (
+    <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 44, gap: 24 }}>
+      <PhoneGlow />
+
+      {/* Left: stat */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ opacity: badgeOpacity }}>
+          <AccentLine delay={0} width={48} />
+        </div>
+        <div style={{ opacity: numOpacity, transform: `translateY(${numY}px)` }}>
+          <div style={{
+            fontSize: 106, fontWeight: 900, color: COLORS.orange,
+            lineHeight: 0.95, letterSpacing: -3, fontFamily,
+            textShadow: '0 0 55px rgba(232,119,34,0.38)',
+          }}>
+            {number}
+          </div>
+        </div>
+        <RichText text={label} baseFontSize={34} baseWeight={500} delay={20} textAlign="left" lineHeight={1.4} />
+        <div style={{ opacity: badgeOpacity }}>
+          <Badge text={badge} delay={0} />
+        </div>
       </div>
-    </SceneEnter>
+
+      {/* Right: phone */}
+      <PhoneMockup delay={6} tiltY={-13} width={330}>
+        {phoneType === 'unanswered' ? <WhatsAppUnanswered /> : <GrowthAnalyticsScreen mode="growth" />}
+      </PhoneMockup>
+    </AbsoluteFill>
+  );
+};
+
+// ─── Insight: split layout — texto izquierda, WhatsApp auto derecha ──────────
+
+const InsightScene: React.FC<{
+  text: string;
+  badge?: string;
+  durationInFrames: number;
+}> = ({ text, badge, durationInFrames }) => (
+  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 44, gap: 24 }}>
+    <PhoneGlow />
+
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <AccentLine delay={0} width={52} />
+      <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
+      <RichText text={text} baseFontSize={48} baseWeight={700} delay={12} textAlign="left" lineHeight={1.25} />
+    </div>
+
+    <PhoneMockup delay={8} tiltY={-13} width={330}>
+      <WhatsAppAutoReply />
+    </PhoneMockup>
   </AbsoluteFill>
 );
 
-const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: number }> = ({ text, badge, durationInFrames }) => (
-  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
-    <ChatMockupBg delay={6} />
-    <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-        <Badge text={badge || 'LO QUE NADIE TE DICE'} delay={0} />
-        <RichText text={text} baseFontSize={52} baseWeight={700} delay={12} textAlign="center" lineHeight={1.3} />
-      </div>
-    </SceneEnter>
-  </AbsoluteFill>
-);
+// ─── CTA: full-width ─────────────────────────────────────────────────────────
 
 const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => {
   const frame = useCurrentFrame();
@@ -75,6 +140,8 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
     </AbsoluteFill>
   );
 };
+
+// ─── Composition ─────────────────────────────────────────────────────────────
 
 export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, badge }) => {
   const { fps } = useVideoConfig();
@@ -99,13 +166,13 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
         <TransitionSeries.Transition presentation={fade()} timing={timing} />
 
         <TransitionSeries.Sequence durationInFrames={s2Duration}>
-          <StatScene number={stat1.number} label={stat1.label} badge="DATO REAL" durationInFrames={s2Duration} />
+          <StatScene number={stat1.number} label={stat1.label} badge="DATO REAL" durationInFrames={s2Duration} phoneType="unanswered" />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition presentation={fade()} timing={timing} />
 
         <TransitionSeries.Sequence durationInFrames={s3Duration}>
-          <StatScene number={stat2.number} label={stat2.label} badge="RESULTADO PROBADO" durationInFrames={s3Duration} />
+          <StatScene number={stat2.number} label={stat2.label} badge="RESULTADO PROBADO" durationInFrames={s3Duration} phoneType="growth" />
         </TransitionSeries.Sequence>
 
         <TransitionSeries.Transition presentation={fade()} timing={timing} />
