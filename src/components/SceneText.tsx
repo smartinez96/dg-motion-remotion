@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Easing } from 'remotion';
-import { COLORS, TOKENS } from '../fonts';
+import { TOKENS } from '../fonts';
 import { GlowText } from './GlowText';
 import { useTheme } from '../ThemeContext';
 
@@ -154,6 +154,7 @@ export const RichText: React.FC<{
 }> = ({ text, baseFontSize, baseWeight = 800, delay = 0, textAlign = 'center', lineHeight = 1.2 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const theme = useTheme();
   const lf = Math.max(0, frame - delay);
 
   const opacity    = interpolate(lf, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
@@ -182,7 +183,7 @@ export const RichText: React.FC<{
                   </GlowText>
                 )
                 : (
-                  <span key={`s-${i}`} style={{ color: COLORS.primary }}>
+                  <span key={`s-${i}`} style={{ color: theme.textPrimary }}>
                     {line}
                   </span>
                 )

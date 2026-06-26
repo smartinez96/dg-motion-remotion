@@ -17,7 +17,9 @@ import { IconBadge } from '../components/IconBadge';
 import { ChatMockup } from '../components/ChatMockup';
 import type { ChatMessage } from '../components/ChatMockup';
 import { sceneSettle, TIMING_SETTLE } from '../components/SceneTransition';
-import { COLORS, TOKENS, fontFamily } from '../fonts';
+import { TOKENS, fontFamily } from '../fonts';
+import { ThemeProvider } from '../ThemeContext';
+import { darkTheme, lightTheme } from '../themes';
 import type { IntroProps } from '../types';
 
 const SAFE_X = 80;
@@ -51,9 +53,10 @@ const CtaPill: React.FC<{ delay: number }> = ({ delay }) => {
   );
 };
 
-export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
+export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta, theme: themeName = 'dark' }) => {
   const { fps } = useVideoConfig();
   const frame   = useCurrentFrame();
+  const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
   const s1 = Math.round(3   * fps);
   const s2 = Math.round(3.5 * fps);
@@ -63,6 +66,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
   const bgIconOpacity = interpolate(frame, [0, 50], [0, 0.03], { extrapolateRight: 'clamp' });
 
   return (
+    <ThemeProvider theme={themeObj}>
     <AbsoluteFill style={{ fontFamily }}>
       <Background />
 
@@ -83,7 +87,7 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
             <SceneEnter durationInFrames={s1} exitDuration={0}>
               <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
                 <Badge text="AI MARKETING AGENCY" delay={0} />
-                <SceneText text={line1} fontSize={92} color={COLORS.primary} fontWeight={900} delay={10} textAlign="center" lineHeight={1.05} letterSpacing={-2} />
+                <SceneText text={line1} fontSize={92} color={themeObj.textPrimary} fontWeight={900} delay={10} textAlign="center" lineHeight={1.05} letterSpacing={-2} />
                 <SceneText text={line2} fontSize={28} color={TOKENS.accentPrimary} fontWeight={600} delay={22} textAlign="center" letterSpacing={1} />
                 <AccentLine delay={32} width={100} />
               </div>
@@ -114,18 +118,17 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
 
         {/* ── Scene 3: CTA ──────────────────────────────────────────────── */}
         <TransitionSeries.Sequence durationInFrames={s3}>
-          <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
-            {/* ChatMockup como fondo parcial — da contexto de respuesta inmediata */}
-            <div style={{ position: 'absolute', right: 55, bottom: 300, opacity: 0.20, zIndex: 0 }}>
-              <ChatMockup messages={CTA_MESSAGES} delay={18} stagger={16} width={480} />
+          <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 40, paddingTop: 130, paddingBottom: 130, gap: 32 }}>
+            {/* Izquierda: texto CTA */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 36 }}>
+              <Badge text="DA EL PRIMER PASO" delay={0} />
+              <RichText text={cta} baseFontSize={52} baseWeight={800} delay={10} textAlign="left" lineHeight={1.2} />
+              <CtaPill delay={24} />
             </div>
-            <SceneEnter durationInFrames={s3} exitDuration={0}>
-              <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X, gap: 36 }}>
-                <Badge text="DA EL PRIMER PASO" delay={0} />
-                <RichText text={cta} baseFontSize={58} baseWeight={800} delay={12} textAlign="center" lineHeight={1.2} />
-                <CtaPill delay={26} />
-              </AbsoluteFill>
-            </SceneEnter>
+            {/* Derecha: ChatMockup — conversación como elemento visual primario */}
+            <div style={{ width: 390, flexShrink: 0 }}>
+              <ChatMockup messages={CTA_MESSAGES} delay={12} stagger={16} width={390} />
+            </div>
           </AbsoluteFill>
         </TransitionSeries.Sequence>
 
@@ -137,5 +140,6 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta }) => {
 
       </TransitionSeries>
     </AbsoluteFill>
+    </ThemeProvider>
   );
 };

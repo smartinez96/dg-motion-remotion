@@ -52,6 +52,8 @@ const COMP_MAP = {
 const avatarJobs = {};
 
 function buildInputProps(type, content) {
+  const theme = content.theme === 'light' ? 'light' : 'dark';
+
   if (type === 'stats') {
     return {
       hook: content.hook || '',
@@ -59,6 +61,7 @@ function buildInputProps(type, content) {
       stat2: content.stat2 || { number: '0', label: '' },
       insight: content.insight || '',
       cta: content.cta || '',
+      theme,
     };
   }
 
@@ -68,6 +71,7 @@ function buildInputProps(type, content) {
       line2: content.line2 || 'AI Marketing Agency',
       tagline: content.tagline || '',
       cta: content.cta || '',
+      theme,
     };
   }
 
@@ -79,6 +83,7 @@ function buildInputProps(type, content) {
       scene3: content.scene3 || '',
       scene4: content.scene4 || '',
       cta: content.cta || '',
+      theme,
     };
   }
 
@@ -90,6 +95,7 @@ function buildInputProps(type, content) {
         body: s.body || s.text || s.content || '',
       })),
       title: content.title,
+      theme,
     };
   }
 

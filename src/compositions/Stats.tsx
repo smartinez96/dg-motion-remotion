@@ -21,6 +21,8 @@ import {
   WhatsAppAutoReply,
 } from '../components/PhoneScreens';
 import { TOKENS, fontFamily } from '../fonts';
+import { ThemeProvider } from '../ThemeContext';
+import { darkTheme, lightTheme } from '../themes';
 import type { StatsProps } from '../types';
 
 const SAFE_X = 80;
@@ -151,8 +153,9 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
 
 // ─── Composition ─────────────────────────────────────────────────────────────
 
-export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, badge }) => {
+export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, badge, theme: themeName = 'dark' }) => {
   const { fps } = useVideoConfig();
+  const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
   const s1  = Math.round(3   * fps);
   const s2  = Math.round(3.5 * fps);
@@ -162,6 +165,7 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
   const sLo = Math.round(3.5 * fps);
 
   return (
+    <ThemeProvider theme={themeObj}>
     <AbsoluteFill>
       <Background />
       <TransitionSeries>
@@ -195,5 +199,6 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>
+    </ThemeProvider>
   );
 };

@@ -10,6 +10,7 @@ export type StatsProps = {
   insight: string;
   cta: string;
   badge?: string;
+  theme?: 'dark' | 'light';
 };
 
 export type IntroProps = {
@@ -17,6 +18,7 @@ export type IntroProps = {
   line2: string;
   tagline: string;
   cta: string;
+  theme?: 'dark' | 'light';
 };
 
 export type FullProps = {
@@ -26,6 +28,7 @@ export type FullProps = {
   scene3: string;
   scene4: string;
   cta: string;
+  theme?: 'dark' | 'light';
 };
 
 export type SlideItem = {
@@ -36,6 +39,7 @@ export type SlideItem = {
 export type CarouselProps = {
   slides: SlideItem[];
   title?: string;
+  theme?: 'dark' | 'light';
 };
 
 export type CaptionGroup = {

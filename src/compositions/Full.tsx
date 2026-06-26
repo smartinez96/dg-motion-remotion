@@ -23,7 +23,9 @@ import {
   GrowthAnalyticsScreen,
   GoogleReviewsScreen,
 } from '../components/PhoneScreens';
-import { COLORS, TOKENS, fontFamily } from '../fonts';
+import { TOKENS, fontFamily } from '../fonts';
+import { ThemeProvider, useTheme } from '../ThemeContext';
+import { darkTheme, lightTheme } from '../themes';
 import type { FullProps } from '../types';
 
 const SAFE_X = 70;
@@ -83,10 +85,16 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const theme = useTheme();
   const numOpacity = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
   const numY = spring({ frame, fps, config: { damping: 16, stiffness: 100, mass: 0.8 }, from: 32, to: 0 });
   const glow = isHighlight ? 0.5 + Math.sin(frame / 30) * 0.5 : 0;
   const variant = PHONE_BY_STEP[step - 1] ?? 'unanswered';
+
+  const isDark = theme.mode === 'dark';
+  const circleBorder = isHighlight ? 'rgba(255,107,26,0.9)' : (isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)');
+  const circleColor  = isHighlight ? TOKENS.accentPrimary : (isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.35)');
+  const circleBg     = isHighlight ? 'rgba(255,107,26,0.12)' : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)');
 
   return (
     <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 30, paddingTop: 130, paddingBottom: 130, gap: 28 }}>
@@ -95,16 +103,16 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
         <div style={{
           opacity: numOpacity, transform: `translateY(${numY}px)`,
           width: 60, height: 60, borderRadius: '50%',
-          border: `2px solid ${isHighlight ? 'rgba(255,107,26,0.9)' : 'rgba(255,255,255,0.18)'}`,
+          border: `2px solid ${circleBorder}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 24, fontWeight: 800,
-          color: isHighlight ? TOKENS.accentPrimary : 'rgba(255,255,255,0.45)',
-          backgroundColor: isHighlight ? 'rgba(255,107,26,0.12)' : 'rgba(255,255,255,0.04)',
+          color: circleColor,
+          backgroundColor: circleBg,
           boxShadow: isHighlight ? `0 0 ${18 + glow * 14}px rgba(255,107,26,${0.22 + glow * 0.20})` : 'none',
         }}>{step}</div>
         <SceneText
           text={text} fontSize={50}
-          color={isHighlight ? TOKENS.accentPrimary : COLORS.primary}
+          color={isHighlight ? TOKENS.accentPrimary : theme.textPrimary}
           fontWeight={700} delay={14} textAlign="left" lineHeight={1.3}
           textShadow={isHighlight ? '0 0 32px rgba(255,107,26,0.55)' : undefined}
         />
@@ -120,19 +128,17 @@ const StepScene: React.FC<{ step: number; text: string; isHighlight: boolean; du
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => (
-  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
-    {/* ChatMockup como elemento de profundidad detrás del texto */}
-    <div style={{ position: 'absolute', right: 60, bottom: 260, opacity: 0.18, zIndex: 0 }}>
-      <ChatMockup messages={HOOK_MESSAGES} delay={14} stagger={16} width={500} />
+  <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: SAFE_X, paddingRight: 40, paddingTop: 130, paddingBottom: 130, gap: 32 }}>
+    {/* Izquierda: texto del hook */}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 32 }}>
+      <Badge text="EL ERROR MAS COMUN" delay={0} />
+      <RichText text={text} baseFontSize={60} baseWeight={800} delay={10} textAlign="left" lineHeight={1.2} />
+      <AccentLine delay={24} width={80} />
     </div>
-
-    <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-        <Badge text="EL ERROR MAS COMUN" delay={0} />
-        <RichText text={text} baseFontSize={68} baseWeight={800} delay={12} textAlign="center" lineHeight={1.18} />
-        <AccentLine delay={28} width={90} />
-      </div>
-    </SceneEnter>
+    {/* Derecha: ChatMockup — mensajes sin respuesta que muestran el problema */}
+    <div style={{ width: 420, flexShrink: 0 }}>
+      <ChatMockup messages={HOOK_MESSAGES} delay={12} stagger={14} width={420} />
+    </div>
   </AbsoluteFill>
 );
 
@@ -164,14 +170,16 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
 
 // ─── Composition ─────────────────────────────────────────────────────────────
 
-export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4, cta }) => {
+export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4, cta, theme: themeName = 'dark' }) => {
   const { fps } = useVideoConfig();
+  const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const hookDuration  = Math.round(3   * fps);
   const sceneDuration = Math.round(2.5 * fps);
   const ctaDuration   = Math.round(2.5 * fps);
   const logoDuration  = Math.round(3.5 * fps);
 
   return (
+    <ThemeProvider theme={themeObj}>
     <AbsoluteFill style={{ fontFamily }}>
       <Background />
       <TransitionSeries>
@@ -210,5 +218,6 @@ export const Full: React.FC<FullProps> = ({ hook, scene1, scene2, scene3, scene4
         </TransitionSeries.Sequence>
       </TransitionSeries>
     </AbsoluteFill>
+    </ThemeProvider>
   );
 };
