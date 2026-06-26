@@ -46,6 +46,7 @@ const COMP_MAP = {
   intro: 'DG-Intro',
   full: 'DG-Full',
   carousel: 'DG-Carousel',
+  lightpreview: 'DG-LightPreview',
 };
 
 const avatarJobs = {};
@@ -110,7 +111,7 @@ app.post('/render', async (req, res) => {
 
   const compositionId = COMP_MAP[type];
   if (!compositionId) {
-    return res.status(400).json({ error: `Unknown type: ${type}. Valid: stats, intro, full, carousel` });
+    return res.status(400).json({ error: `Unknown type: ${type}. Valid: stats, intro, full, carousel, lightpreview` });
   }
 
   const filename = `dg-${type}-${Date.now()}.mp4`;

@@ -2,6 +2,7 @@ import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Easing } from 'remotion';
 import { COLORS, TOKENS } from '../fonts';
 import { GlowText } from './GlowText';
+import { useTheme } from '../ThemeContext';
 
 const ACCENT_RGBA = (a: number) => `rgba(255,107,26,${a})`; // FF6B1A
 
@@ -42,6 +43,7 @@ export const SceneText: React.FC<SceneTextProps> = ({
 
 export const AccentLine: React.FC<{ delay?: number; width?: number }> = ({ delay = 0, width = 60 }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
   const lf    = Math.max(0, frame - delay);
   const scaleX  = interpolate(lf, [0, 15], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const opacity = interpolate(lf, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
@@ -49,11 +51,11 @@ export const AccentLine: React.FC<{ delay?: number; width?: number }> = ({ delay
   return (
     <div style={{
       width, height: 3,
-      backgroundColor: TOKENS.accentPrimary,
+      backgroundColor: theme.accentPrimary,
       transformOrigin: 'left center',
       transform: `scaleX(${scaleX})`,
       opacity, borderRadius: 2,
-      boxShadow: `0 0 10px ${ACCENT_RGBA(0.65)}`,
+      boxShadow: theme.mode === 'dark' ? `0 0 10px rgba(255,107,26,0.65)` : '0 2px 6px rgba(255,107,26,0.30)',
     }} />
   );
 };
@@ -62,20 +64,30 @@ export const AccentLine: React.FC<{ delay?: number; width?: number }> = ({ delay
 
 export const Badge: React.FC<{ text: string; delay?: number }> = ({ text, delay = 0 }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
   const lf    = Math.max(0, frame - delay);
   const opacity    = interpolate(lf, [0, 14], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const translateY = interpolate(lf, [0, 14], [-12, 0], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
 
+  const isDark = theme.mode === 'dark';
+  const dotShadow = isDark
+    ? `0 0 8px ${ACCENT_RGBA(0.9)}`
+    : '0 2px 6px rgba(255,107,26,0.35)';
+  const textColor = isDark ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.65)';
+  const badgeShadow = isDark ? undefined : '0 2px 12px rgba(0,0,0,0.07)';
+
   return (
     <div style={{
       opacity, transform: `translateY(${translateY}px)`,
-      display: 'inline-flex', alignItems: 'center', gap: 10,
-      padding: '10px 24px', borderRadius: 100,
+      display: 'inline-flex', alignItems: 'center', gap: 12,
+      padding: '13px 28px', borderRadius: 100,
       backgroundColor: ACCENT_RGBA(0.10),
       border: `1px solid ${ACCENT_RGBA(0.32)}`,
+      marginBottom: 14,
+      boxShadow: badgeShadow,
     }}>
-      <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: `0 0 8px ${ACCENT_RGBA(0.9)}`, flexShrink: 0 }} />
-      <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.75)', letterSpacing: 3, textTransform: 'uppercase' as const }}>
+      <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: dotShadow, flexShrink: 0 }} />
+      <span style={{ fontSize: 19, fontWeight: 700, lineHeight: 1, color: textColor, letterSpacing: 3, textTransform: 'uppercase' as const }}>
         {text}
       </span>
     </div>
@@ -86,21 +98,27 @@ export const Badge: React.FC<{ text: string; delay?: number }> = ({ text, delay 
 
 export const FeaturePill: React.FC<{ icon: string; text: string; delay?: number }> = ({ icon, text, delay = 0 }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
   const lf    = Math.max(0, frame - delay);
   const opacity    = interpolate(lf, [0, 18], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const translateX = interpolate(lf, [0, 18], [-24, 0], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+
+  const isDark = theme.mode === 'dark';
+  const pillBg     = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+  const pillBorder = isDark ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(0,0,0,0.09)';
+  const textColor  = isDark ? 'rgba(255,255,255,0.85)' : theme.textSecondary;
+  const dotShadow  = isDark ? `0 0 6px rgba(255,107,26,0.8)` : '0 2px 6px rgba(255,107,26,0.35)';
 
   return (
     <div style={{
       opacity, transform: `translateX(${translateX}px)`,
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '18px 28px', borderRadius: 16,
-      backgroundColor: `rgba(255,255,255,0.05)`,
-      border: '1px solid rgba(255,255,255,0.10)', width: '100%',
+      backgroundColor: pillBg, border: pillBorder, width: '100%',
     }}>
       <span style={{ fontSize: 28 }}>{icon}</span>
-      <span style={{ fontSize: 26, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{text}</span>
-      <div style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: `0 0 6px ${ACCENT_RGBA(0.8)}`, flexShrink: 0 }} />
+      <span style={{ fontSize: 26, fontWeight: 600, color: textColor }}>{text}</span>
+      <div style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', backgroundColor: theme.accentPrimary, boxShadow: dotShadow, flexShrink: 0 }} />
     </div>
   );
 };
