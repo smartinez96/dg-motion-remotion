@@ -17,7 +17,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Stats"
         component={Stats}
-        durationInFrames={90 + 105 + 105 + 90 + 75 + 105 - 5 * 8}
+        durationInFrames={90 + 105 + 105 + 90 + 75 + 105 - 5 * 10}
         fps={FPS}
         width={W}
         height={H}

@@ -1,4 +1,5 @@
 import { loadFont } from '@remotion/google-fonts/Montserrat';
+export { COLORS, TOKENS } from './components/tokens';
 
 const { fontFamily } = loadFont('normal', {
   subsets: ['latin'],
@@ -6,16 +7,6 @@ const { fontFamily } = loadFont('normal', {
 });
 
 export { fontFamily };
-
-export const COLORS = {
-  bg: '#080808',
-  primary: '#FFFFFF',
-  orange: '#E87722',
-  gray: 'rgba(255,255,255,0.40)',
-  lightGray: 'rgba(255,255,255,0.12)',
-  mediumGray: 'rgba(255,255,255,0.65)',
-  offWhite: '#F5F5F5',
-};
 
 export const SAFE = {
   x: 80,

@@ -1,17 +1,15 @@
 import React from 'react';
 import { AbsoluteFill, useVideoConfig, useCurrentFrame, interpolate, Easing } from 'remotion';
-import { TransitionSeries, linearTiming } from '@remotion/transitions';
-import { slide } from '@remotion/transitions/slide';
-import { fade } from '@remotion/transitions/fade';
+import { TransitionSeries } from '@remotion/transitions';
 import { Background } from '../components/Background';
 import { AccentLine, RichText } from '../components/SceneText';
 import { LogoScreen } from '../components/LogoScreen';
-import { COLORS, fontFamily } from '../fonts';
+import { sceneSlide, sceneSettle, TIMING_SETTLE } from '../components/SceneTransition';
+import { TOKENS, fontFamily } from '../fonts';
 import type { CarouselProps } from '../types';
 
 const SAFE_X = 80;
 const SLIDE_SECONDS = 4;
-const TRANS = 10;
 
 const SlideScene: React.FC<{
   index: number;
@@ -22,7 +20,7 @@ const SlideScene: React.FC<{
 }> = ({ index, total, headline, body, durationInFrames }) => {
   const frame = useCurrentFrame();
 
-  const bodyOpacity = interpolate(frame, [22, 38], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const bodyOpacity    = interpolate(frame, [22, 38], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const bodyTranslateY = interpolate(frame, [22, 38], [20, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
 
   return (
@@ -31,9 +29,9 @@ const SlideScene: React.FC<{
       {/* Progress bar */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 52 }}>
         {Array.from({ length: total }).map((_, i) => (
-          <div key={i} style={{ flex: 1, height: 3, backgroundColor: i <= index ? COLORS.orange : 'rgba(255,255,255,0.12)', borderRadius: 2, opacity: i < index ? 0.45 : 1, overflow: 'hidden', boxShadow: i === index ? '0 0 8px rgba(232,119,34,0.5)' : 'none' }}>
+          <div key={i} style={{ flex: 1, height: 3, backgroundColor: i <= index ? TOKENS.accentPrimary : 'rgba(255,255,255,0.12)', borderRadius: 2, opacity: i < index ? 0.45 : 1, overflow: 'hidden', boxShadow: i === index ? '0 0 8px rgba(255,107,26,0.5)' : 'none' }}>
             {i === index && (
-              <div style={{ height: '100%', width: `${(frame / durationInFrames) * 100}%`, backgroundColor: COLORS.orange, borderRadius: 2, boxShadow: '0 0 6px rgba(232,119,34,0.8)' }} />
+              <div style={{ height: '100%', width: `${(frame / durationInFrames) * 100}%`, backgroundColor: TOKENS.accentPrimary, borderRadius: 2, boxShadow: '0 0 6px rgba(255,107,26,0.8)' }} />
             )}
           </div>
         ))}
@@ -43,8 +41,8 @@ const SlideScene: React.FC<{
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 32 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
           <AccentLine delay={0} width={60} />
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 100, backgroundColor: 'rgba(232,119,34,0.10)', border: '1px solid rgba(232,119,34,0.28)' }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: COLORS.orange, letterSpacing: 2 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '8px 20px', borderRadius: 100, backgroundColor: 'rgba(255,107,26,0.10)', border: '1px solid rgba(255,107,26,0.28)' }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: TOKENS.accentPrimary, letterSpacing: 2 }}>
               {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
             </span>
           </div>
@@ -52,15 +50,15 @@ const SlideScene: React.FC<{
 
         <RichText text={headline} baseFontSize={70} baseWeight={800} delay={10} textAlign="left" lineHeight={1.15} />
 
-        <div style={{ fontSize: 36, fontWeight: 400, color: COLORS.mediumGray, lineHeight: 1.55, opacity: bodyOpacity, transform: `translateY(${bodyTranslateY}px)` }}>
+        <div style={{ fontSize: 36, fontWeight: 400, color: TOKENS.textSecondary, lineHeight: 1.55, opacity: bodyOpacity, transform: `translateY(${bodyTranslateY}px)` }}>
           {body}
         </div>
       </div>
 
       {/* Footer */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: COLORS.orange, boxShadow: '0 0 8px rgba(232,119,34,0.8)' }} />
-        <div style={{ fontSize: 18, color: COLORS.gray, fontWeight: 600, letterSpacing: 2 }}>@DIGITALGROWTH.WR</div>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: '0 0 8px rgba(255,107,26,0.8)' }} />
+        <div style={{ fontSize: 18, color: 'rgba(255,255,255,0.40)', fontWeight: 600, letterSpacing: 2 }}>@DIGITALGROWTH.WR</div>
       </div>
 
     </AbsoluteFill>
@@ -82,8 +80,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, title }) => {
   }
 
   const slideDuration = Math.round(SLIDE_SECONDS * fps);
-  const logoDuration = Math.round(4 * fps);
-  const timing = linearTiming({ durationInFrames: TRANS });
+  const logoDuration  = Math.round(4 * fps);
 
   return (
     <AbsoluteFill style={{ fontFamily }}>
@@ -92,14 +89,14 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, title }) => {
         {slides.map((slide_item, i) => (
           <React.Fragment key={i}>
             {i > 0 && (
-              <TransitionSeries.Transition presentation={slide({ direction: 'from-right' })} timing={timing} />
+              <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
             )}
             <TransitionSeries.Sequence durationInFrames={slideDuration}>
               <SlideScene index={i} total={slides.length} headline={slide_item.headline} body={slide_item.body} durationInFrames={slideDuration} />
             </TransitionSeries.Sequence>
           </React.Fragment>
         ))}
-        <TransitionSeries.Transition presentation={fade()} timing={timing} />
+        <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
         <TransitionSeries.Sequence durationInFrames={logoDuration}>
           <LogoScreen />
         </TransitionSeries.Sequence>

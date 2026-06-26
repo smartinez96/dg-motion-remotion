@@ -1,6 +1,11 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Easing } from 'remotion';
-import { COLORS } from '../fonts';
+import { COLORS, TOKENS } from '../fonts';
+import { GlowText } from './GlowText';
+
+const ACCENT_RGBA = (a: number) => `rgba(255,107,26,${a})`; // FF6B1A
+
+// ─── SceneText ───────────────────────────────────────────────────────────────
 
 type SceneTextProps = {
   text: string;
@@ -16,217 +21,111 @@ type SceneTextProps = {
 };
 
 export const SceneText: React.FC<SceneTextProps> = ({
-  text,
-  fontSize,
-  color,
-  fontWeight = 700,
-  delay = 0,
-  textAlign = 'center',
-  letterSpacing = 0,
-  lineHeight = 1.2,
-  maxWidth,
-  textShadow,
+  text, fontSize, color, fontWeight = 700, delay = 0,
+  textAlign = 'center', letterSpacing = 0, lineHeight = 1.2, maxWidth, textShadow,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const localFrame = Math.max(0, frame - delay);
+  const lf = Math.max(0, frame - delay);
 
-  const opacity = interpolate(localFrame, [0, 14], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
-
-  const translateY = spring({
-    frame: localFrame,
-    fps,
-    config: { damping: 18, stiffness: 110, mass: 0.7 },
-    from: 28,
-    to: 0,
-  });
+  const opacity    = interpolate(lf, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
+  const translateY = spring({ frame: lf, fps, config: { damping: 18, stiffness: 110, mass: 0.7 }, from: 28, to: 0 });
 
   return (
-    <div
-      style={{
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        fontSize,
-        color,
-        fontWeight,
-        textAlign,
-        letterSpacing,
-        lineHeight,
-        maxWidth,
-        textShadow,
-      }}
-    >
+    <div style={{ opacity, transform: `translateY(${translateY}px)`, fontSize, color, fontWeight, textAlign, letterSpacing, lineHeight, maxWidth, textShadow }}>
       {text}
     </div>
   );
 };
 
-export const AccentLine: React.FC<{ delay?: number; width?: number }> = ({
-  delay = 0,
-  width = 60,
-}) => {
+// ─── AccentLine ──────────────────────────────────────────────────────────────
+
+export const AccentLine: React.FC<{ delay?: number; width?: number }> = ({ delay = 0, width = 60 }) => {
   const frame = useCurrentFrame();
-  const localFrame = Math.max(0, frame - delay);
-
-  const scaleX = interpolate(localFrame, [0, 15], [0, 1], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
-  const opacity = interpolate(localFrame, [0, 10], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
+  const lf    = Math.max(0, frame - delay);
+  const scaleX  = interpolate(lf, [0, 15], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const opacity = interpolate(lf, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
 
   return (
-    <div
-      style={{
-        width,
-        height: 3,
-        backgroundColor: '#E87722',
-        transformOrigin: 'left center',
-        transform: `scaleX(${scaleX})`,
-        opacity,
-        borderRadius: 2,
-        boxShadow: '0 0 10px rgba(232,119,34,0.6)',
-      }}
-    />
+    <div style={{
+      width, height: 3,
+      backgroundColor: TOKENS.accentPrimary,
+      transformOrigin: 'left center',
+      transform: `scaleX(${scaleX})`,
+      opacity, borderRadius: 2,
+      boxShadow: `0 0 10px ${ACCENT_RGBA(0.65)}`,
+    }} />
   );
 };
+
+// ─── Badge ───────────────────────────────────────────────────────────────────
 
 export const Badge: React.FC<{ text: string; delay?: number }> = ({ text, delay = 0 }) => {
   const frame = useCurrentFrame();
-  const localFrame = Math.max(0, frame - delay);
-
-  const opacity = interpolate(localFrame, [0, 14], [0, 1], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
-  const translateY = interpolate(localFrame, [0, 14], [-12, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
+  const lf    = Math.max(0, frame - delay);
+  const opacity    = interpolate(lf, [0, 14], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const translateY = interpolate(lf, [0, 14], [-12, 0], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
 
   return (
-    <div
-      style={{
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '10px 24px',
-        borderRadius: 100,
-        backgroundColor: 'rgba(232,119,34,0.10)',
-        border: '1px solid rgba(232,119,34,0.32)',
-      }}
-    >
-      <div
-        style={{
-          width: 7,
-          height: 7,
-          borderRadius: '50%',
-          backgroundColor: '#E87722',
-          boxShadow: '0 0 8px rgba(232,119,34,0.9)',
-          flexShrink: 0,
-        }}
-      />
-      <span
-        style={{
-          fontSize: 16,
-          fontWeight: 700,
-          color: 'rgba(255,255,255,0.75)',
-          letterSpacing: 3,
-          textTransform: 'uppercase',
-        }}
-      >
+    <div style={{
+      opacity, transform: `translateY(${translateY}px)`,
+      display: 'inline-flex', alignItems: 'center', gap: 10,
+      padding: '10px 24px', borderRadius: 100,
+      backgroundColor: ACCENT_RGBA(0.10),
+      border: `1px solid ${ACCENT_RGBA(0.32)}`,
+    }}>
+      <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: `0 0 8px ${ACCENT_RGBA(0.9)}`, flexShrink: 0 }} />
+      <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.75)', letterSpacing: 3, textTransform: 'uppercase' as const }}>
         {text}
       </span>
     </div>
   );
 };
 
-export const FeaturePill: React.FC<{
-  icon: string;
-  text: string;
-  delay?: number;
-}> = ({ icon, text, delay = 0 }) => {
+// ─── FeaturePill ─────────────────────────────────────────────────────────────
+
+export const FeaturePill: React.FC<{ icon: string; text: string; delay?: number }> = ({ icon, text, delay = 0 }) => {
   const frame = useCurrentFrame();
-  const localFrame = Math.max(0, frame - delay);
-
-  const opacity = interpolate(localFrame, [0, 18], [0, 1], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
-  const translateX = interpolate(localFrame, [0, 18], [-24, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
+  const lf    = Math.max(0, frame - delay);
+  const opacity    = interpolate(lf, [0, 18], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const translateX = interpolate(lf, [0, 18], [-24, 0], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
 
   return (
-    <div
-      style={{
-        opacity,
-        transform: `translateX(${translateX}px)`,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        padding: '18px 28px',
-        borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.10)',
-        width: '100%',
-      }}
-    >
+    <div style={{
+      opacity, transform: `translateX(${translateX}px)`,
+      display: 'flex', alignItems: 'center', gap: 16,
+      padding: '18px 28px', borderRadius: 16,
+      backgroundColor: `rgba(255,255,255,0.05)`,
+      border: '1px solid rgba(255,255,255,0.10)', width: '100%',
+    }}>
       <span style={{ fontSize: 28 }}>{icon}</span>
-      <span style={{ fontSize: 26, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
-        {text}
-      </span>
-      <div
-        style={{
-          marginLeft: 'auto',
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          backgroundColor: '#E87722',
-          boxShadow: '0 0 6px rgba(232,119,34,0.8)',
-          flexShrink: 0,
-        }}
-      />
+      <span style={{ fontSize: 26, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{text}</span>
+      <div style={{ marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: `0 0 6px ${ACCENT_RGBA(0.8)}`, flexShrink: 0 }} />
     </div>
   );
 };
 
-// White flash overlay — add after content in any Sequence to create cinematic scene transition
+// ─── FlashIn ─────────────────────────────────────────────────────────────────
+
 export const FlashIn: React.FC<{ durationFrames?: number }> = ({ durationFrames = 10 }) => {
   const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, durationFrames], [1, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.out(Easing.cubic),
-  });
+  const opacity = interpolate(frame, [0, durationFrames], [1, 0], { extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic) });
   if (opacity <= 0.01) return null;
-  return (
-    <AbsoluteFill style={{ backgroundColor: '#FFFFFF', opacity, pointerEvents: 'none' }} />
-  );
+  return <AbsoluteFill style={{ backgroundColor: '#FFFFFF', opacity, pointerEvents: 'none' }} />;
 };
 
-// Parse [[word]] syntax into styled segments
-const parseSegments = (text: string): { t: string; o: boolean }[] => {
-  const parts = text.split(/(\[\[.*?\]\])/g);
-  return parts
+// ─── RichText — [[...]] usa GlowText con pulso orgánico ──────────────────────
+
+const parseSegments = (text: string): { t: string; o: boolean }[] =>
+  text
+    .split(/(\[\[.*?\]\])/g)
     .filter(p => p !== '')
-    .map(part => {
-      if (part.startsWith('[[') && part.endsWith(']]')) {
-        return { t: part.slice(2, -2), o: true };
-      }
-      return { t: part, o: false };
-    });
-};
+    .map(part =>
+      part.startsWith('[[') && part.endsWith(']]')
+        ? { t: part.slice(2, -2), o: true }
+        : { t: part, o: false }
+    );
 
-// Mixed typography — supports [[word]] syntax for orange neon accent words
 export const RichText: React.FC<{
   text: string;
   baseFontSize: number;
@@ -237,49 +136,38 @@ export const RichText: React.FC<{
 }> = ({ text, baseFontSize, baseWeight = 800, delay = 0, textAlign = 'center', lineHeight = 1.2 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const localFrame = Math.max(0, frame - delay);
+  const lf = Math.max(0, frame - delay);
 
-  const opacity = interpolate(localFrame, [0, 14], [0, 1], {
-    extrapolateRight: 'clamp',
-  });
-  const translateY = spring({
-    frame: localFrame,
-    fps,
-    config: { damping: 18, stiffness: 110, mass: 0.7 },
-    from: 28,
-    to: 0,
-  });
+  const opacity    = interpolate(lf, [0, 14], [0, 1], { extrapolateRight: 'clamp' });
+  const translateY = spring({ frame: lf, fps, config: { damping: 18, stiffness: 110, mass: 0.7 }, from: 28, to: 0 });
 
   const segments = parseSegments(text);
 
   return (
-    <div
-      style={{
-        opacity,
-        transform: `translateY(${translateY}px)`,
-        fontSize: baseFontSize,
-        fontWeight: baseWeight,
-        lineHeight,
-        textAlign,
-      }}
-    >
+    <div style={{ opacity, transform: `translateY(${translateY}px)`, fontSize: baseFontSize, fontWeight: baseWeight, lineHeight, textAlign }}>
       {segments.map((seg, i) =>
         seg.t.split('\n').map((line, li) => (
           <React.Fragment key={`${i}-${li}`}>
             {li > 0 && <br />}
             {line && (
-              <span
-                style={{
-                  color: seg.o ? COLORS.orange : COLORS.primary,
-                  fontSize: seg.o ? `${Math.round(baseFontSize * 1.12)}px` : undefined,
-                  fontWeight: seg.o ? 900 : undefined,
-                  textShadow: seg.o
-                    ? '0 0 32px rgba(232,119,34,0.70), 0 0 64px rgba(232,119,34,0.35)'
-                    : undefined,
-                }}
-              >
-                {line}
-              </span>
+              seg.o
+                ? (
+                  // GlowText: pulso orgánico con noise2D, seed único por segmento
+                  <GlowText
+                    key={`g-${i}`}
+                    seed={`rw-${i}`}
+                    fontWeight={900}
+                    fontSize={Math.round(baseFontSize * 1.1)}
+                    intensity={0.80}
+                  >
+                    {line}
+                  </GlowText>
+                )
+                : (
+                  <span key={`s-${i}`} style={{ color: COLORS.primary }}>
+                    {line}
+                  </span>
+                )
             )}
           </React.Fragment>
         ))

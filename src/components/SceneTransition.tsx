@@ -1,0 +1,85 @@
+import React from 'react';
+import { AbsoluteFill } from 'remotion';
+import { linearTiming } from '@remotion/transitions';
+import type { TransitionPresentation, TransitionPresentationComponentProps } from '@remotion/transitions';
+
+// ─── Settle: fade + escena se "asienta" desde 1.04 → 1.0 ────────────────────
+// Más profesional que un fade plano — la escena entra con un micro-zoom
+
+const SettleComponent: React.FC<TransitionPresentationComponentProps<Record<string, never>>> = ({
+  children,
+  presentationDirection,
+  presentationProgress,
+}) => {
+  const entering = presentationDirection === 'entering';
+  const opacity = entering ? presentationProgress : 1 - presentationProgress;
+  // Entering: 1.04 → 1.00 (settle in). Exiting: 1.00 → 1.04 (push away)
+  const scale = entering
+    ? 1.04 - 0.04 * presentationProgress
+    : 1.00 + 0.04 * presentationProgress;
+
+  return (
+    <AbsoluteFill
+      style={{
+        opacity,
+        transform: `scale(${scale.toFixed(4)})`,
+        transformOrigin: 'center center',
+      }}
+    >
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+export const sceneSettle = (): TransitionPresentation<Record<string, never>> => ({
+  component: SettleComponent,
+  props: {},
+});
+
+// ─── Slide-settle: slide desde un lado + settle combinados ──────────────────
+
+type SlideProps = { direction: 'from-right' | 'from-left' };
+
+const SlideSettleComponent: React.FC<TransitionPresentationComponentProps<SlideProps>> = ({
+  children,
+  presentationDirection,
+  presentationProgress,
+  passedProps,
+}) => {
+  const entering = presentationDirection === 'entering';
+  const opacity = entering ? presentationProgress : 1 - presentationProgress;
+  const dir = passedProps.direction === 'from-right' ? 1 : -1;
+
+  // Desplazamiento horizontal que se suma al settle
+  const tx = entering
+    ? dir * (1 - presentationProgress) * 72
+    : dir * presentationProgress * -72;
+
+  const scale = entering
+    ? 1.03 - 0.03 * presentationProgress
+    : 1.00 + 0.03 * presentationProgress;
+
+  return (
+    <AbsoluteFill
+      style={{
+        opacity,
+        transform: `translateX(${tx.toFixed(2)}px) scale(${scale.toFixed(4)})`,
+        transformOrigin: 'center center',
+      }}
+    >
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+export const sceneSlide = (
+  direction: 'from-right' | 'from-left' = 'from-right'
+): TransitionPresentation<SlideProps> => ({
+  component: SlideSettleComponent,
+  props: { direction },
+});
+
+// ─── Timings estándar ────────────────────────────────────────────────────────
+
+export const TIMING_SETTLE = linearTiming({ durationInFrames: 10 });
+export const TIMING_FAST   = linearTiming({ durationInFrames: 7 });
