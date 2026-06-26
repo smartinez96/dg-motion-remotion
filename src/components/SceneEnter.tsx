@@ -32,15 +32,11 @@ export const SceneEnter: React.FC<SceneEnterProps> = ({
     to: 0,
   });
 
-  // Fast opacity fade-in (4 frames) so it doesn't compound badly with TransitionSeries
   const fadeIn = interpolate(frame, [0, 4], [0, 1], { extrapolateRight: 'clamp' });
-  const fadeOut = interpolate(
-    frame,
-    [durationInFrames - exitDuration, durationInFrames],
-    [1, 0],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-  );
-  const opacity = exitDuration > 0 ? Math.min(fadeIn, fadeOut) : fadeIn;
+  const fadeOut = exitDuration > 0
+    ? interpolate(frame, [durationInFrames - exitDuration, durationInFrames], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
+    : 1;
+  const opacity = Math.min(fadeIn, fadeOut);
 
   return (
     <div
