@@ -17,7 +17,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Stats"
         component={Stats}
-        durationInFrames={Math.round(19 * FPS)}
+        durationInFrames={90 + 105 + 105 + 90 + 75 + 105 - 5 * 8}
         fps={FPS}
         width={W}
         height={H}
@@ -34,7 +34,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Intro"
         component={Intro}
-        durationInFrames={Math.round(13 * FPS)}
+        durationInFrames={90 + 105 + 75 + 120 - 3 * 10}
         fps={FPS}
         width={W}
         height={H}
@@ -49,7 +49,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Full"
         component={Full}
-        durationInFrames={Math.round(19 * FPS)}
+        durationInFrames={90 + 75 + 75 + 75 + 75 + 75 + 105 - 6 * 10}
         fps={FPS}
         width={W}
         height={H}
@@ -66,7 +66,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Carousel"
         component={Carousel}
-        durationInFrames={Math.round((5 * 4 + 4) * FPS)}
+        durationInFrames={5 * 120 + 120 - 5 * 10}
         fps={FPS}
         width={W}
         height={H}

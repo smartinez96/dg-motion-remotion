@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame, interpolate, Easing } from 'remotion';
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate, spring, Easing } from 'remotion';
 import { COLORS } from '../fonts';
 
 type SceneTextProps = {
@@ -28,16 +28,19 @@ export const SceneText: React.FC<SceneTextProps> = ({
   textShadow,
 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const localFrame = Math.max(0, frame - delay);
 
-  const opacity = interpolate(localFrame, [0, 16], [0, 1], {
+  const opacity = interpolate(localFrame, [0, 14], [0, 1], {
     extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  const translateY = interpolate(localFrame, [0, 16], [28, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  const translateY = spring({
+    frame: localFrame,
+    fps,
+    config: { damping: 18, stiffness: 110, mass: 0.7 },
+    from: 28,
+    to: 0,
   });
 
   return (
@@ -233,15 +236,18 @@ export const RichText: React.FC<{
   lineHeight?: number;
 }> = ({ text, baseFontSize, baseWeight = 800, delay = 0, textAlign = 'center', lineHeight = 1.2 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   const localFrame = Math.max(0, frame - delay);
 
-  const opacity = interpolate(localFrame, [0, 16], [0, 1], {
+  const opacity = interpolate(localFrame, [0, 14], [0, 1], {
     extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
-  const translateY = interpolate(localFrame, [0, 16], [28, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  const translateY = spring({
+    frame: localFrame,
+    fps,
+    config: { damping: 18, stiffness: 110, mass: 0.7 },
+    from: 28,
+    to: 0,
   });
 
   const segments = parseSegments(text);

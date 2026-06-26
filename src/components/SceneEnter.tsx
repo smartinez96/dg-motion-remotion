@@ -1,43 +1,46 @@
-import { useCurrentFrame, interpolate, Easing } from 'remotion';
+import React from 'react';
+import { useCurrentFrame, useVideoConfig, spring, interpolate } from 'remotion';
 
 type SceneEnterProps = {
   children: React.ReactNode;
   durationInFrames: number;
-  enterDuration?: number;
   exitDuration?: number;
 };
 
 export const SceneEnter: React.FC<SceneEnterProps> = ({
   children,
   durationInFrames,
-  enterDuration = 18,
   exitDuration = 12,
 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, enterDuration], [0, 1], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  // Physics-based entrance — spring overshoots slightly and settles (more organic than bezier)
+  const scaleIn = spring({
+    frame,
+    fps,
+    config: { damping: 16, stiffness: 100, mass: 0.8 },
+    from: 1.06,
+    to: 1.0,
   });
 
-  const scaleIn = interpolate(frame, [0, enterDuration], [1.05, 1.0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  const translateIn = spring({
+    frame,
+    fps,
+    config: { damping: 16, stiffness: 100, mass: 0.8 },
+    from: 18,
+    to: 0,
   });
 
-  const translateIn = interpolate(frame, [0, enterDuration], [14, 0], {
-    extrapolateRight: 'clamp',
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
+  // Fast opacity fade-in (4 frames) so it doesn't compound badly with TransitionSeries
+  const fadeIn = interpolate(frame, [0, 4], [0, 1], { extrapolateRight: 'clamp' });
   const fadeOut = interpolate(
     frame,
     [durationInFrames - exitDuration, durationInFrames],
     [1, 0],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
-
-  const opacity = Math.min(fadeIn, fadeOut);
+  const opacity = exitDuration > 0 ? Math.min(fadeIn, fadeOut) : fadeIn;
 
   return (
     <div

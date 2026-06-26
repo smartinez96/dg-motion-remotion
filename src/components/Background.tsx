@@ -1,4 +1,5 @@
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { noise2D } from '@remotion/noise';
 import { DiagonalStreaks } from './DiagonalStreaks';
 
 const PARTICLES = [
@@ -25,10 +26,10 @@ export const Background: React.FC = () => {
 
   const breathe = Math.sin(frame / 70 * Math.PI);
 
-  // Moving orange orb — slow, low
-  const t = frame / 30;
-  const orbX = 540 + Math.sin(t * 0.25) * 180;
-  const orbY = 1580 + Math.cos(t * 0.20) * 220;
+  // Organic orb movement via simplex noise — non-repeating, no mechanical sine pattern
+  const t = frame / 160;
+  const orbX = 540 + noise2D('orb-x', t, 0) * 230;
+  const orbY = 1580 + noise2D('orb-y', 0, t) * 270;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#080808', overflow: 'hidden' }}>
