@@ -72,7 +72,10 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta, theme:
 
       {/* Watermark logo — muy sutil */}
       <AbsoluteFill style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: bgIconOpacity }}>
-        <Img src={staticFile('logo-icon-white.png')} style={{ width: 700 }} />
+        <Img
+          src={staticFile('logo-icon-white.png')}
+          style={{ width: 700, filter: themeObj.mode === 'light' ? 'invert(1)' : undefined }}
+        />
       </AbsoluteFill>
 
       <TransitionSeries>

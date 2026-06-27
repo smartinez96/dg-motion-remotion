@@ -71,23 +71,24 @@ export const Badge: React.FC<{ text: string; delay?: number }> = ({ text, delay 
 
   const isDark = theme.mode === 'dark';
   const dotShadow = isDark
-    ? `0 0 8px ${ACCENT_RGBA(0.9)}`
-    : '0 2px 6px rgba(255,107,26,0.35)';
-  const textColor = isDark ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.65)';
-  const badgeShadow = isDark ? undefined : '0 2px 12px rgba(0,0,0,0.07)';
+    ? `0 0 10px ${ACCENT_RGBA(1.0)}, 0 0 4px ${ACCENT_RGBA(0.6)}`
+    : `0 0 8px ${ACCENT_RGBA(0.5)}`;
+  const badgeGlow = isDark
+    ? `0 0 18px ${ACCENT_RGBA(0.22)}, inset 0 0 8px ${ACCENT_RGBA(0.06)}`
+    : `0 3px 14px ${ACCENT_RGBA(0.18)}`;
 
   return (
     <div style={{
       opacity, transform: `translateY(${translateY}px)`,
       display: 'inline-flex', alignItems: 'center', gap: 12,
-      padding: '16px 36px', borderRadius: 100,
-      backgroundColor: ACCENT_RGBA(0.12),
-      border: `1.5px solid ${ACCENT_RGBA(0.40)}`,
+      padding: '15px 34px', borderRadius: 100,
+      backgroundColor: ACCENT_RGBA(0.05),
+      border: `2px solid ${ACCENT_RGBA(1.0)}`,
       marginBottom: 14,
-      boxShadow: badgeShadow,
+      boxShadow: badgeGlow,
     }}>
       <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: TOKENS.accentPrimary, boxShadow: dotShadow, flexShrink: 0 }} />
-      <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1, color: textColor, letterSpacing: 4, textTransform: 'uppercase' as const }}>
+      <span style={{ fontSize: 24, fontWeight: 800, lineHeight: 1, color: TOKENS.accentPrimary, letterSpacing: 4, textTransform: 'uppercase' as const }}>
         {text}
       </span>
     </div>
