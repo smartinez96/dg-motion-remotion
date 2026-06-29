@@ -100,23 +100,6 @@ export const LogoScreen: React.FC = () => {
           opacity: screenOpacity,
         }}
       >
-        {/* Ícono DG pequeño — entra con el logo */}
-        <div
-          style={{
-            opacity: logoOpacity,
-            transform: `scale(${logoScale})`,
-            marginBottom: 28,
-          }}
-        >
-          <Img
-            src={staticFile('logo-icon-white.png')}
-            style={{
-              width: 72, height: 72, objectFit: 'contain',
-              filter: isDark ? undefined : 'invert(1)',
-            }}
-          />
-        </div>
-
         {/* Full logo wordmark */}
         <div
           style={{
