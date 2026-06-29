@@ -46,6 +46,7 @@ const COMP_MAP = {
   intro: 'DG-Intro',
   full: 'DG-Full',
   carousel: 'DG-Carousel',
+  reel: 'DG-Reel',
   lightpreview: 'DG-LightPreview',
 };
 
@@ -82,6 +83,17 @@ function buildInputProps(type, content) {
       scene2: content.scene2 || '',
       scene3: content.scene3 || '',
       scene4: content.scene4 || '',
+      cta: content.cta || '',
+      theme,
+    };
+  }
+
+  if (type === 'reel') {
+    return {
+      beat1: content.beat1 || '',
+      beat2: content.beat2 || '',
+      beat3: content.beat3 || '',
+      beat4: content.beat4 || '',
       cta: content.cta || '',
       theme,
     };

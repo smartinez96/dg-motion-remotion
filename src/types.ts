@@ -42,6 +42,15 @@ export type CarouselProps = {
   theme?: 'dark' | 'light';
 };
 
+export type ReelProps = {
+  beat1: string;
+  beat2: string;
+  beat3: string;
+  beat4: string;
+  cta: string;
+  theme?: 'dark' | 'light';
+};
+
 export type CaptionGroup = {
   text: string;
   start: number;

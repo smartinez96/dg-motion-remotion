@@ -5,6 +5,7 @@ import { Intro } from './compositions/Intro';
 import { Full } from './compositions/Full';
 import { Carousel } from './compositions/Carousel';
 import { AvatarCaptions } from './compositions/AvatarCaptions';
+import { Reel } from './compositions/Reel';
 import { LightPreview } from './compositions/LightPreview';
 
 
@@ -81,6 +82,22 @@ export const RemotionRoot: React.FC = () => {
           ],
         }}
       />
+      <Composition
+        id="DG-Reel"
+        component={Reel}
+        durationInFrames={90 + 90 + 90 + 90 + 105 + 105 - 5 * 10}
+        fps={FPS}
+        width={W}
+        height={H}
+        defaultProps={{
+          beat1: '3 de cada 10 llamadas',
+          beat2: 'sin respuesta al día',
+          beat3: 'son [[3 clientes]] que pierdes',
+          beat4: 'para siempre',
+          cta: 'Nosotros lo [[resolvemos]] esta semana',
+        }}
+      />
+
       <Composition
         id="DG-AvatarCaptions"
         component={AvatarCaptions}
