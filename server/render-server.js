@@ -41,7 +41,16 @@ async function getBundle() {
 const BROWSER_EXECUTABLE = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
 const CHROMIUM_OPTIONS = {
   disableWebSecurity: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-first-run',
+    '--disable-extensions',
+    '--disable-features=VizDisplayCompositor',
+    '--use-gl=swiftshader',
+  ],
 };
 
 const COMP_MAP = {
