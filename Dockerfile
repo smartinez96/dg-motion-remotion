@@ -36,13 +36,15 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
-# Wrapper that injects required Docker flags — Remotion's ChromiumOptions has no 'args' field
-RUN printf '#!/bin/sh\nexec /usr/bin/chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"\n' \
-    > /usr/local/bin/chromium-docker && chmod +x /usr/local/bin/chromium-docker
+# Debian's /usr/bin/chromium script sources /etc/chromium.d/ and applies $CHROMIUM_FLAGS
+# This is the official mechanism to inject flags — no wrapper needed
+RUN mkdir -p /etc/chromium.d && \
+    printf 'CHROMIUM_FLAGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu"\n' \
+    > /etc/chromium.d/docker.conf
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/local/bin/chromium-docker
-ENV REMOTION_CHROME_EXECUTABLE=/usr/local/bin/chromium-docker
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV REMOTION_CHROME_EXECUTABLE=/usr/bin/chromium
 
 WORKDIR /app
 
