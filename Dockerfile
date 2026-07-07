@@ -36,9 +36,13 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
+# Wrapper that injects required Docker flags — Remotion's ChromiumOptions has no 'args' field
+RUN printf '#!/bin/sh\nexec /usr/bin/chromium --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"\n' \
+    > /usr/local/bin/chromium-docker && chmod +x /usr/local/bin/chromium-docker
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-ENV REMOTION_CHROME_EXECUTABLE=/usr/bin/chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/local/bin/chromium-docker
+ENV REMOTION_CHROME_EXECUTABLE=/usr/local/bin/chromium-docker
 
 WORKDIR /app
 
