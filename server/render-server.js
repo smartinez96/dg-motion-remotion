@@ -7,19 +7,22 @@ const { renderMedia, selectComposition } = require('@remotion/renderer');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' }));
 
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || 'https://digital-growth-dg-remotion.fgb9uu.easypanel.host';
 const PORT = process.env.PORT || 3333;
 
 const AVATARES_DIR = path.join(__dirname, '..', 'public', 'avatares');
+const FILES_DIR = path.join(__dirname, '..', 'public', 'files');
 
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 if (!fs.existsSync(AVATARES_DIR)) fs.mkdirSync(AVATARES_DIR, { recursive: true });
+if (!fs.existsSync(FILES_DIR)) fs.mkdirSync(FILES_DIR, { recursive: true });
 
 app.use('/output', express.static(OUTPUT_DIR));
 app.use('/avatares', express.static(AVATARES_DIR));
+app.use('/files', express.static(FILES_DIR));
 
 let bundleLocation = null;
 
@@ -251,6 +254,23 @@ app.get('/render-avatar-status/:id', (req, res) => {
   const job = avatarJobs[req.params.id];
   if (!job) return res.status(404).json({ error: 'not found' });
   res.json(job);
+});
+
+// Upload a static file to /files/ — accepts { filename, content } (content = base64 or utf8 string)
+app.post('/files/upload', (req, res) => {
+  const { filename, content, encoding } = req.body;
+  if (!filename || !content) return res.status(400).json({ error: 'filename and content required' });
+  const safe = path.basename(filename);
+  const dest = path.join(FILES_DIR, safe);
+  try {
+    const buf = encoding === 'base64' ? Buffer.from(content, 'base64') : Buffer.from(content, 'utf8');
+    fs.writeFileSync(dest, buf);
+    const url = `${PUBLIC_BASE_URL}/files/${safe}`;
+    console.log('File saved:', url);
+    res.json({ url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
