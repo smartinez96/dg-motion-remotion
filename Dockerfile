@@ -1,8 +1,8 @@
 FROM node:20-bookworm-slim
 
-# Install Chrome dependencies for Remotion renderer
+# Runtime dependencies for Chrome (same whether system or Chrome for Testing)
 RUN apt-get update && apt-get install -y \
-  chromium \
+  ca-certificates \
   fonts-liberation \
   libasound2 \
   libatk-bridge2.0-0 \
@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
   libcairo2 \
   libcups2 \
   libdbus-1-3 \
+  libdrm2 \
   libexpat1 \
   libfontconfig1 \
   libgbm1 \
@@ -28,6 +29,7 @@ RUN apt-get update && apt-get install -y \
   libxext6 \
   libxfixes3 \
   libxi6 \
+  libxkbcommon0 \
   libxrandr2 \
   libxrender1 \
   libxss1 \
@@ -36,16 +38,6 @@ RUN apt-get update && apt-get install -y \
   --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
-# Debian's /usr/bin/chromium script sources /etc/chromium.d/ and applies $CHROMIUM_FLAGS
-# This is the official mechanism to inject flags — no wrapper needed
-RUN mkdir -p /etc/chromium.d && \
-    printf 'CHROMIUM_FLAGS="--no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu"\n' \
-    > /etc/chromium.d/docker.conf
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-ENV REMOTION_CHROME_EXECUTABLE=/usr/bin/chromium
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -53,7 +45,14 @@ RUN npm install --omit=dev 2>/dev/null || npm install
 
 COPY . .
 
+# Download Remotion's pinned Chrome for Testing and create a --no-sandbox wrapper
+# (Remotion's ChromiumOptions has no 'args' field so flags must be in the binary wrapper)
+RUN node server/setup-browser.js
+
 RUN mkdir -p output
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/local/bin/remotion-chrome
 
 EXPOSE 3333
 
