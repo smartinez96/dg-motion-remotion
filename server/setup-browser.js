@@ -1,16 +1,27 @@
-// Downloads Chrome for Testing (Remotion-compatible version) at Docker build time
-// and creates a wrapper script that injects --no-sandbox for container environments.
+// Downloads Chrome for Testing at Docker build time and creates a --no-sandbox wrapper.
+// ensureBrowser() returns BrowserStatus: { type, path } — not { command }.
 const { ensureBrowser } = require('@remotion/renderer');
-const { writeFileSync } = require('fs');
+const { writeFileSync, existsSync } = require('fs');
 
 ensureBrowser({ logLevel: 'verbose' })
-  .then(({ command }) => {
-    console.log('Chrome for Testing downloaded at:', command);
+  .then((result) => {
+    console.log('Browser status:', JSON.stringify(result));
+
+    if (!result.path) {
+      throw new Error('No browser path in result: ' + JSON.stringify(result));
+    }
+    if (!existsSync(result.path)) {
+      throw new Error('Binary not found at path: ' + result.path);
+    }
+
+    console.log('Chrome binary at:', result.path);
+
     const wrapper = [
       '#!/bin/sh',
-      `exec ${command} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"`,
+      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"`,
       '',
     ].join('\n');
+
     writeFileSync('/usr/local/bin/remotion-chrome', wrapper, { mode: 0o755 });
     console.log('Wrapper created at /usr/local/bin/remotion-chrome');
   })
