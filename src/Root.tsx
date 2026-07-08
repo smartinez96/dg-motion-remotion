@@ -7,6 +7,7 @@ import { Carousel } from './compositions/Carousel';
 import { AvatarCaptions } from './compositions/AvatarCaptions';
 import { Reel } from './compositions/Reel';
 import { LightPreview } from './compositions/LightPreview';
+import { Keyword } from './compositions/Keyword';
 
 
 const W = 1080;
@@ -109,6 +110,22 @@ export const RemotionRoot: React.FC = () => {
           avatarVideoUrl: '',
           groups: [],
           audioDurationSecs: 35,
+        }}
+      />
+
+      <Composition
+        id="DG-Keyword"
+        component={Keyword}
+        durationInFrames={90 + 105 + 105 + 120 + 105 - 4 * 10}
+        fps={FPS}
+        width={W}
+        height={H}
+        defaultProps={{
+          hook: '¿Tu negocio pierde [[clientes]] mientras duermes?',
+          problema: 'Cada llamada sin respuesta son [[$30]] que se van con la competencia.',
+          prueba: 'Con atención automática: [[+40%]] de citas en el primer mes.',
+          cta: 'Comenta [[CLIENTES]] y te mando gratis la checklist',
+          lead_magnet_label: '7 automatizaciones que todo negocio en Ecuador necesita en 2026',
         }}
       />
 

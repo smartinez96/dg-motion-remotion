@@ -51,6 +51,15 @@ export type ReelProps = {
   theme?: 'dark' | 'light';
 };
 
+export type KeywordProps = {
+  hook: string;
+  problema: string;
+  prueba: string;
+  cta: string;
+  lead_magnet_label: string;
+  theme?: 'dark' | 'light';
+};
+
 export type CaptionGroup = {
   text: string;
   start: number;

@@ -51,6 +51,7 @@ const COMP_MAP = {
   full: 'DG-Full',
   carousel: 'DG-Carousel',
   reel: 'DG-Reel',
+  keyword: 'DG-Keyword',
   lightpreview: 'DG-LightPreview',
 };
 
@@ -99,6 +100,17 @@ function buildInputProps(type, content) {
       beat3: content.beat3 || '',
       beat4: content.beat4 || '',
       cta: content.cta || '',
+      theme,
+    };
+  }
+
+  if (type === 'keyword') {
+    return {
+      hook: content.hook || '',
+      problema: content.problema || '',
+      prueba: content.prueba || '',
+      cta: content.cta || '',
+      lead_magnet_label: content.lead_magnet_label || '',
       theme,
     };
   }
