@@ -24,12 +24,19 @@ app.use('/output', express.static(OUTPUT_DIR));
 app.use('/avatares', express.static(AVATARES_DIR));
 app.use('/files', express.static(FILES_DIR));
 
-let bundleLocation = null;
+// Use the pre-built bundle baked into the Docker image (build/ is created by `npx remotion bundle`
+// during docker build). Falls back to runtime bundling in local dev when build/ doesn't exist.
+const PREBUNDLE_PATH = path.join(__dirname, '..', 'build');
+let bundleLocation = fs.existsSync(PREBUNDLE_PATH) ? PREBUNDLE_PATH : null;
+
+if (bundleLocation) {
+  console.log('Using pre-built bundle:', bundleLocation);
+}
 
 async function getBundle() {
   if (bundleLocation) return bundleLocation;
 
-  console.log('Bundling Remotion project...');
+  console.log('Pre-built bundle not found. Bundling Remotion project at runtime (dev mode)...');
   bundleLocation = await bundle({
     entryPoint: path.join(__dirname, '..', 'src', 'index.ts'),
     webpackOverride: (config) => config,

@@ -41,9 +41,14 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev 2>/dev/null || npm install
+RUN npm install
 
 COPY . .
+
+# Pre-build the Remotion webpack bundle at image build time.
+# This avoids running webpack inside the container at runtime, which hangs under
+# Docker memory constraints. The build/ directory is baked into the image.
+RUN npx remotion bundle
 
 # Download Remotion's pinned Chrome for Testing and create a --no-sandbox wrapper
 # (Remotion's ChromiumOptions has no 'args' field so flags must be in the binary wrapper)
