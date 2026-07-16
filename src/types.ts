@@ -23,11 +23,16 @@ export type IntroProps = {
 
 export type FullProps = {
   hook: string;
-  scene1: string;
-  scene2: string;
-  scene3: string;
-  scene4: string;
+  scene1_titulo: string;
+  scene1_cuerpo: string;
+  scene2_titulo: string;
+  scene2_cuerpo: string;
+  scene3_titulo: string;
+  scene3_cuerpo: string;
+  scene4_titulo: string;
+  scene4_cuerpo: string;
   cta: string;
+  dolor?: string;
   theme?: 'dark' | 'light';
 };
 

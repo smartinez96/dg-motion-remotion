@@ -84,11 +84,16 @@ function buildInputProps(type, content) {
   if (type === 'full') {
     return {
       hook: content.hook || '',
-      scene1: content.scene1 || '',
-      scene2: content.scene2 || '',
-      scene3: content.scene3 || '',
-      scene4: content.scene4 || '',
+      scene1_titulo: content.scene1_titulo || '',
+      scene1_cuerpo: content.scene1_cuerpo || '',
+      scene2_titulo: content.scene2_titulo || '',
+      scene2_cuerpo: content.scene2_cuerpo || '',
+      scene3_titulo: content.scene3_titulo || '',
+      scene3_cuerpo: content.scene3_cuerpo || '',
+      scene4_titulo: content.scene4_titulo || '',
+      scene4_cuerpo: content.scene4_cuerpo || '',
       cta: content.cta || '',
+      dolor: content.dolor || '',
       theme,
     };
   }

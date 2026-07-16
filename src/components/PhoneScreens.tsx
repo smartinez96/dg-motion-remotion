@@ -313,3 +313,223 @@ export const GrowthAnalyticsScreen: React.FC<{ mode?: 'growth' | 'flat' }> = ({ 
     </div>
   );
 };
+
+// ─── Screen 5: Sales Pipeline — propuestas sin cierre ────────────────────────
+
+export const SalesPipelineScreen: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  const LEADS = [
+    { name: 'Empresa Acosta', days: '14 días sin respuesta' },
+    { name: 'Ferretería López', days: '8 días sin respuesta' },
+    { name: 'Clínica del Norte', days: '21 días sin respuesta' },
+  ];
+
+  const totalVal = Math.round(interpolate(frame, [40, 65], [0, 3], { extrapolateRight: 'clamp' }));
+
+  return (
+    <div style={{ width: '100%', height: '100%', backgroundColor: '#1c1c1e', display: 'flex', flexDirection: 'column', fontFamily: SF }}>
+      <StatusBar time="10:30" />
+
+      <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>CRM · Propuestas activas</div>
+        <div style={{ fontSize: 10.5, color: '#636366', marginTop: 2 }}>Pipeline de ventas</div>
+      </div>
+
+      {/* Stage pills */}
+      <div style={{ display: 'flex', padding: '8px 10px', gap: 5 }}>
+        {['Nuevo', 'Contactado', 'Propuesta', 'Cerrado'].map((s, i) => (
+          <div key={i} style={{
+            flex: 1, textAlign: 'center' as const,
+            padding: '4px 0', borderRadius: 6,
+            backgroundColor: i === 2 ? 'rgba(255,69,58,0.15)' : 'rgba(255,255,255,0.04)',
+            border: i === 2 ? '1px solid rgba(255,69,58,0.35)' : '1px solid rgba(255,255,255,0.06)',
+            fontSize: 9, fontWeight: i === 2 ? 700 : 400,
+            color: i === 2 ? '#ff453a' : '#636366',
+          }}>{s}</div>
+        ))}
+      </div>
+
+      {/* Stuck leads */}
+      <div style={{ flex: 1, padding: '4px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {LEADS.map((lead, i) => {
+          const lf = Math.max(0, frame - (i * 14 + 16));
+          const opacity = interpolate(lf, [0, 10], [0, 1], { extrapolateRight: 'clamp', easing: Easing.out(Easing.quad) });
+          const ty = interpolate(lf, [0, 10], [10, 0], { extrapolateRight: 'clamp' });
+          const badgeLf = Math.max(0, frame - (i * 14 + 36));
+          const badgeOp = interpolate(badgeLf, [0, 8], [0, 1], { extrapolateRight: 'clamp' });
+          return (
+            <div key={i} style={{
+              opacity, transform: `translateY(${ty}px)`,
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              borderRadius: 10,
+              padding: '8px 11px',
+              borderLeft: '3px solid rgba(255,69,58,0.55)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#e5e5ea' }}>{lead.name}</div>
+                <div style={{
+                  opacity: badgeOp,
+                  backgroundColor: 'rgba(255,69,58,0.15)',
+                  borderRadius: 5,
+                  padding: '2px 6px',
+                  fontSize: 9, color: '#ff453a', fontWeight: 700,
+                }}>● Sin cierre</div>
+              </div>
+              <div style={{ fontSize: 10, color: '#636366', marginTop: 3 }}>{lead.days}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom stat */}
+      <div style={{
+        margin: '4px 10px 10px',
+        padding: '7px 11px',
+        backgroundColor: 'rgba(255,69,58,0.10)',
+        borderRadius: 9,
+        border: '1px solid rgba(255,69,58,0.22)',
+        display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#ff453a' }}>{totalVal}</div>
+        <div style={{ fontSize: 10.5, color: '#aeaeb2', lineHeight: 1.35 }}>propuestas sin cierre{'\n'}este mes</div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Screen 6: Calendar — citas perdidas ─────────────────────────────────────
+
+export const CalendarMissedScreen: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  const DAYS = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE'];
+  const SLOTS = [
+    { day: 0, time: '09:00', name: 'Carlos M.', missed: true },
+    { day: 1, time: '11:30', name: 'Ana López', missed: true },
+    { day: 2, time: '10:00', name: '', empty: true },
+    { day: 3, time: '14:00', name: 'Luis V.', missed: true },
+    { day: 4, time: '09:30', name: '', empty: true },
+  ];
+
+  return (
+    <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', display: 'flex', flexDirection: 'column', fontFamily: SF }}>
+      <StatusBar time="08:55" dark={false} />
+
+      {/* Header */}
+      <div style={{ padding: '8px 13px 6px', borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1c1c1e' }}>Agenda — Esta semana</div>
+        <div style={{ fontSize: 10.5, color: '#8e8e93', marginTop: 1 }}>Julio 2026</div>
+      </div>
+
+      {/* Day headers */}
+      <div style={{ display: 'flex', padding: '6px 10px 4px' }}>
+        {DAYS.map((d, i) => (
+          <div key={i} style={{ flex: 1, textAlign: 'center' as const, fontSize: 9.5, fontWeight: 600, color: '#8e8e93', letterSpacing: 0.5 }}>{d}</div>
+        ))}
+      </div>
+
+      {/* Appointment slots */}
+      <div style={{ flex: 1, padding: '0 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {SLOTS.map((slot, i) => {
+          const lf = Math.max(0, frame - (i * 11 + 12));
+          const opacity = interpolate(lf, [0, 10], [0, 1], { extrapolateRight: 'clamp', easing: Easing.out(Easing.quad) });
+          return (
+            <div key={i} style={{
+              opacity,
+              display: 'flex', alignItems: 'center', gap: 8,
+              backgroundColor: slot.missed ? 'rgba(255,59,48,0.08)' : 'rgba(0,0,0,0.03)',
+              borderRadius: 8,
+              padding: '6px 10px',
+              border: slot.missed ? '1px solid rgba(255,59,48,0.25)' : '1px solid rgba(0,0,0,0.07)',
+            }}>
+              <div style={{ width: 3, height: 28, borderRadius: 2, backgroundColor: slot.missed ? '#ff3b30' : '#d1d1d6', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 10, color: '#8e8e93' }}>{slot.time}</div>
+                {slot.empty
+                  ? <div style={{ fontSize: 11.5, color: '#c7c7cc', fontStyle: 'italic' }}>Sin reservar</div>
+                  : (
+                    <>
+                      <div style={{ fontSize: 11.5, fontWeight: 600, color: '#1c1c1e' }}>{slot.name}</div>
+                      {slot.missed && <div style={{ fontSize: 9.5, color: '#ff3b30', fontWeight: 600 }}>No asistió</div>}
+                    </>
+                  )
+                }
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom */}
+      <div style={{ margin: '4px 10px 10px', padding: '7px 11px', backgroundColor: 'rgba(255,59,48,0.08)', borderRadius: 9, border: '1px solid rgba(255,59,48,0.22)' }}>
+        <div style={{ fontSize: 11, color: '#ff3b30', fontWeight: 700 }}>3 citas perdidas esta semana</div>
+        <div style={{ fontSize: 10, color: '#8e8e93', marginTop: 1 }}>sin seguimiento posterior</div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Screen 7: Notifications overload ────────────────────────────────────────
+
+export const NotificationsScreen: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  const NOTIFS = [
+    { app: 'WhatsApp', text: 'María L.: "¿Tienen disponibilidad?"', count: 5, color: '#25d366', time: '23:45' },
+    { app: 'Llamadas',  text: '3 llamadas perdidas',                  count: 3, color: '#ff453a', time: '22:18' },
+    { app: 'WhatsApp', text: 'Carlos: "Buscaré en otro lugar..."',   count: 2, color: '#25d366', time: '21:30' },
+    { app: 'Email',    text: 'Consulta: Precio de servicios',        count: 1, color: '#0a84ff', time: '20:10' },
+  ];
+
+  const totalBadge = Math.round(interpolate(frame, [20, 55], [0, 47], { extrapolateRight: 'clamp', easing: Easing.out(Easing.quad) }));
+
+  return (
+    <div style={{ width: '100%', height: '100%', backgroundColor: '#1c1c1e', display: 'flex', flexDirection: 'column', fontFamily: SF }}>
+      <StatusBar time="00:03" />
+
+      <div style={{ padding: '10px 14px 6px', display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Notificaciones</div>
+        <div style={{
+          backgroundColor: '#ff453a', borderRadius: 9,
+          padding: '1px 7px', fontSize: 11, fontWeight: 700, color: '#fff',
+        }}>{totalBadge}</div>
+      </div>
+
+      <div style={{ flex: 1, padding: '0 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {NOTIFS.map((n, i) => {
+          const lf = Math.max(0, frame - (i * 12 + 8));
+          const opacity = interpolate(lf, [0, 10], [0, 1], { extrapolateRight: 'clamp', easing: Easing.out(Easing.quad) });
+          const ty = interpolate(lf, [0, 10], [14, 0], { extrapolateRight: 'clamp' });
+          return (
+            <div key={i} style={{
+              opacity, transform: `translateY(${ty}px)`,
+              backgroundColor: 'rgba(255,255,255,0.07)',
+              borderRadius: 12,
+              padding: '9px 12px',
+              borderLeft: `3px solid ${n.color}`,
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: n.color }}>{n.app}</div>
+                <div style={{ fontSize: 9.5, color: '#636366' }}>{n.time}</div>
+              </div>
+              <div style={{ fontSize: 12, color: '#e5e5ea', lineHeight: 1.4 }}>{n.text}</div>
+              {n.count > 1 && (
+                <div style={{
+                  marginTop: 4, display: 'inline-block',
+                  backgroundColor: n.color, borderRadius: 100,
+                  padding: '1px 7px', fontSize: 9.5, color: '#fff', fontWeight: 700,
+                }}>+{n.count} sin respuesta</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ margin: '4px 10px 10px', padding: '7px 12px', backgroundColor: 'rgba(255,69,58,0.12)', borderRadius: 9, border: '1px solid rgba(255,69,58,0.28)' }}>
+        <div style={{ fontSize: 11, color: '#ff453a', fontWeight: 700 }}>47 mensajes sin atender hoy</div>
+        <div style={{ fontSize: 10, color: '#aeaeb2', marginTop: 1 }}>clientes que no esperarán mañana</div>
+      </div>
+    </div>
+  );
+};

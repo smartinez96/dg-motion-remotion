@@ -1,5 +1,6 @@
 import './index.css';
 import { Composition } from 'remotion';
+import { wordsToFrames } from './compositions/Full';
 import { Stats } from './compositions/Stats';
 import { Intro } from './compositions/Intro';
 import { Full } from './compositions/Full';
@@ -52,17 +53,36 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Full"
         component={Full}
-        durationInFrames={135 + 120 + 120 + 120 + 120 + 120 + 105 - 6 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const hookF = wordsToFrames(props.hook, FPS, 4.5);
+          const s1F   = wordsToFrames(`${props.scene1_titulo} ${props.scene1_cuerpo}`, FPS, 4.5);
+          const s2F   = wordsToFrames(`${props.scene2_titulo} ${props.scene2_cuerpo}`, FPS, 4.5);
+          const s3F   = wordsToFrames(`${props.scene3_titulo} ${props.scene3_cuerpo}`, FPS, 4.5);
+          const s4F   = wordsToFrames(`${props.scene4_titulo} ${props.scene4_cuerpo}`, FPS, 4.5);
+          const ctaF  = wordsToFrames(props.cta, FPS, 5.0);
+          const logoF = Math.round(3.5 * FPS);
+          return {
+            durationInFrames: hookF + s1F + s2F + s3F + s4F + ctaF + logoF - 6 * SETTLE,
+            props,
+          };
+        }}
+        durationInFrames={900}
         fps={FPS}
         width={W}
         height={H}
         defaultProps={{
-          hook: 'El error que cometen los negocios [[con la IA]]',
-          scene1: 'Compran herramientas sin estrategia',
-          scene2: 'No miden resultados reales',
-          scene3: 'Ignoran la automatización de atención al cliente',
-          scene4: 'Pierden clientes por no responder a tiempo',
-          cta: '[[Digital Growth]] resuelve esto',
+          hook: 'Hay lunes en que llegas con energía — y el negocio ya tiene [[3 urgencias]] que resolver antes de las 9am',
+          scene1_titulo: 'El peso recae siempre en el dueño',
+          scene1_cuerpo: 'Sé lo frustrante que es ver cómo el día a día no deja espacio para lo que realmente mueve el negocio.',
+          scene2_titulo: '[[He visto]] el patrón repetirse',
+          scene2_cuerpo: 'Equipos que pasaban el día apagando incendios — y con solo ordenar cómo operan, cada persona empezó a enfocarse en lo que genera dinero.',
+          scene3_titulo: 'Digital Growth construye ese proceso',
+          scene3_cuerpo: 'Para que el negocio funcione aunque tú no estés mirando. No para reemplazar a tu equipo — para que cada uno sepa exactamente qué hacer.',
+          scene4_titulo: 'El dueño pierde [[12 horas]]',
+          scene4_cuerpo: 'por semana en tareas repetitivas que no deberían depender de él para resolverse.',
+          cta: 'Comenta la palabra [[TIEMPO]] y te enviamos un documento con las tareas que más horas le roban a tu equipo — y cómo otros dueños las resolvieron sin contratar a nadie más.',
+          dolor: 'TIEMPO',
         }}
       />
 
