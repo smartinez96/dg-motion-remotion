@@ -142,12 +142,6 @@ function buildInputProps(type, content) {
   return content;
 }
 
-function getCarouselDuration(slides, fps = 30) {
-  const count = Array.isArray(slides) ? slides.length : 0;
-  if (count === 0) return Math.round(10 * fps);
-  return Math.round((count * 4 + 4) * fps);
-}
-
 app.post('/render', async (req, res) => {
   const { type, content } = req.body;
 
@@ -173,9 +167,6 @@ app.post('/render', async (req, res) => {
     const serveUrl = await getBundle();
     console.log(`[render] bundle=${serveUrl} type=${type}`);
 
-    const durationOverride =
-      type === 'carousel' ? getCarouselDuration(inputProps.slides) : undefined;
-
     const withTimeout = (promise, label, ms) =>
       Promise.race([
         promise,
@@ -197,10 +188,6 @@ app.post('/render', async (req, res) => {
       45_000
     );
     console.log(`[render] composition selected: ${compositionId} (${composition.durationInFrames}f)`);
-
-    if (durationOverride) {
-      composition.durationInFrames = durationOverride;
-    }
 
     console.log('[render] calling renderMedia...');
     await withTimeout(

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, useVideoConfig, useCurrentFrame, interpolate, Easing } from 'remotion';
+import { wordsToFrames } from './Full';
 import { TransitionSeries } from '@remotion/transitions';
 import { Background } from '../components/Background';
 import { AccentLine, RichText } from '../components/SceneText';
@@ -11,7 +12,6 @@ import { darkTheme, lightTheme } from '../themes';
 import type { CarouselProps } from '../types';
 
 const SAFE_X = 80;
-const SLIDE_SECONDS = 4;
 
 const SlideScene: React.FC<{
   index: number;
@@ -91,8 +91,10 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, title, theme: themeN
     );
   }
 
-  const slideDuration = Math.round(SLIDE_SECONDS * fps);
-  const logoDuration  = Math.round(4 * fps);
+  const slideDurations = slides.map(s =>
+    wordsToFrames(`${s.headline} ${s.body}`, fps, 4.0)
+  );
+  const logoDuration = Math.round(3.0 * fps);
 
   return (
     <ThemeProvider theme={themeObj}>
@@ -104,8 +106,8 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, title, theme: themeN
             {i > 0 && (
               <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
             )}
-            <TransitionSeries.Sequence durationInFrames={slideDuration}>
-              <SlideScene index={i} total={slides.length} headline={slide_item.headline} body={slide_item.body} durationInFrames={slideDuration} />
+            <TransitionSeries.Sequence durationInFrames={slideDurations[i]}>
+              <SlideScene index={i} total={slides.length} headline={slide_item.headline} body={slide_item.body} durationInFrames={slideDurations[i]} />
             </TransitionSeries.Sequence>
           </React.Fragment>
         ))}

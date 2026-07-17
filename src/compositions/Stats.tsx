@@ -24,6 +24,7 @@ import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { StatsProps } from '../types';
+import { wordsToFrames } from './Full';
 
 const SAFE_X = 80;
 
@@ -157,12 +158,12 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
   const { fps } = useVideoConfig();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
-  const s1  = Math.round(4.5 * fps);
-  const s2  = Math.round(5   * fps);
-  const s3  = Math.round(5   * fps);
-  const s4  = Math.round(4.5 * fps);
-  const s5  = Math.round(4   * fps);
-  const sLo = Math.round(3.5 * fps);
+  const s1  = wordsToFrames(hook, fps, 4.0);
+  const s2  = wordsToFrames(stat1.label, fps, 4.5);
+  const s3  = wordsToFrames(stat2.label, fps, 4.5);
+  const s4  = wordsToFrames(insight, fps, 4.0);
+  const s5  = wordsToFrames(cta, fps, 4.0);
+  const sLo = Math.round(3.0 * fps);
 
   return (
     <ThemeProvider theme={themeObj}>

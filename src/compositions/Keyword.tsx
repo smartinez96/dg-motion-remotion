@@ -2,6 +2,7 @@ import React from 'react';
 import {
   AbsoluteFill,
   useCurrentFrame,
+  useVideoConfig,
   interpolate,
   Easing,
 } from 'remotion';
@@ -14,6 +15,7 @@ import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { KeywordProps } from '../types';
+import { wordsToFrames } from './Full';
 
 const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text }) => {
   const frame = useCurrentFrame();
@@ -114,11 +116,12 @@ export const Keyword: React.FC<KeywordProps> = ({
   hook, problema, prueba, cta, lead_magnet_label, theme: themeName = 'dark',
 }) => {
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
-  const hd = Math.round(3   * 30); // 90f  — hook
-  const pd = Math.round(3.5 * 30); // 105f — problema
-  const rd = Math.round(3.5 * 30); // 105f — prueba
-  const cd = Math.round(4   * 30); // 120f — cta
-  const ld = Math.round(3.5 * 30); // 105f — logo
+  const { fps } = useVideoConfig();
+  const hd = wordsToFrames(hook, fps, 3.0);
+  const pd = wordsToFrames(problema, fps, 3.0);
+  const rd = wordsToFrames(prueba, fps, 3.0);
+  const cd = wordsToFrames(`${cta} ${lead_magnet_label}`, fps, 3.5);
+  const ld = Math.round(3.0 * fps);
 
   return (
     <ThemeProvider theme={themeObj}>

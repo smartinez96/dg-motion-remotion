@@ -21,7 +21,17 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Stats"
         component={Stats}
-        durationInFrames={135 + 150 + 150 + 135 + 120 + 105 - 5 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const s1  = wordsToFrames(props.hook, FPS, 4.0);
+          const s2  = wordsToFrames(props.stat1.label, FPS, 4.5);
+          const s3  = wordsToFrames(props.stat2.label, FPS, 4.5);
+          const s4  = wordsToFrames(props.insight, FPS, 4.0);
+          const s5  = wordsToFrames(props.cta, FPS, 4.0);
+          const sLo = Math.round(3.0 * FPS);
+          return { durationInFrames: s1 + s2 + s3 + s4 + s5 + sLo - 5 * SETTLE, props };
+        }}
+        durationInFrames={745}
         fps={FPS}
         width={W}
         height={H}
@@ -38,7 +48,15 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Intro"
         component={Intro}
-        durationInFrames={135 + 150 + 120 + 120 - 3 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const s1 = wordsToFrames(`${props.line1} ${props.line2}`, FPS, 4.0);
+          const s2 = wordsToFrames(props.tagline, FPS, 4.5);
+          const s3 = wordsToFrames(props.cta, FPS, 3.5);
+          const sL = Math.round(3.0 * FPS);
+          return { durationInFrames: s1 + s2 + s3 + sL - 3 * SETTLE, props };
+        }}
+        durationInFrames={495}
         fps={FPS}
         width={W}
         height={H}
@@ -89,7 +107,19 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Carousel"
         component={Carousel}
-        durationInFrames={5 * 120 + 120 - 5 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const slides = props.slides || [];
+          const slideDs = slides.map((s: { headline: string; body: string }) =>
+            wordsToFrames(`${s.headline} ${s.body}`, FPS, 4.0)
+          );
+          const logoD = Math.round(3.0 * FPS);
+          return {
+            durationInFrames: slideDs.reduce((a: number, b: number) => a + b, 0) + logoD - slides.length * SETTLE,
+            props,
+          };
+        }}
+        durationInFrames={570}
         fps={FPS}
         width={W}
         height={H}
@@ -106,7 +136,17 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Reel"
         component={Reel}
-        durationInFrames={90 + 90 + 90 + 90 + 105 + 105 - 5 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const b1 = wordsToFrames(props.beat1, FPS, 2.5);
+          const b2 = wordsToFrames(props.beat2, FPS, 2.5);
+          const b3 = wordsToFrames(props.beat3, FPS, 2.5);
+          const b4 = wordsToFrames(props.beat4, FPS, 2.5);
+          const ct = wordsToFrames(props.cta, FPS, 3.5);
+          const lo = Math.round(3.0 * FPS);
+          return { durationInFrames: b1 + b2 + b3 + b4 + ct + lo - 5 * SETTLE, props };
+        }}
+        durationInFrames={520}
         fps={FPS}
         width={W}
         height={H}
@@ -136,7 +176,16 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="DG-Keyword"
         component={Keyword}
-        durationInFrames={90 + 105 + 105 + 120 + 105 - 4 * 10}
+        calculateMetadata={async ({ props }) => {
+          const SETTLE = 10;
+          const hd = wordsToFrames(props.hook, FPS, 3.0);
+          const pd = wordsToFrames(props.problema, FPS, 3.0);
+          const rd = wordsToFrames(props.prueba, FPS, 3.0);
+          const cd = wordsToFrames(`${props.cta} ${props.lead_magnet_label}`, FPS, 3.5);
+          const ld = Math.round(3.0 * FPS);
+          return { durationInFrames: hd + pd + rd + cd + ld - 4 * SETTLE, props };
+        }}
+        durationInFrames={485}
         fps={FPS}
         width={W}
         height={H}

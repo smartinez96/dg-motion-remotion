@@ -2,6 +2,7 @@ import React from 'react';
 import {
   AbsoluteFill,
   useCurrentFrame,
+  useVideoConfig,
   interpolate,
   Easing,
 } from 'remotion';
@@ -14,6 +15,7 @@ import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider, useTheme } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { ReelProps } from '../types';
+import { wordsToFrames } from './Full';
 
 const TOTAL_BEATS = 5;
 
@@ -166,41 +168,45 @@ const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ te
 
 export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, theme: themeName = 'dark' }) => {
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
-  const bd = Math.round(3   * 30);
-  const cd = Math.round(3.5 * 30);
-  const ld = Math.round(3.5 * 30);
+  const { fps } = useVideoConfig();
+  const b1d = wordsToFrames(beat1, fps, 2.5);
+  const b2d = wordsToFrames(beat2, fps, 2.5);
+  const b3d = wordsToFrames(beat3, fps, 2.5);
+  const b4d = wordsToFrames(beat4, fps, 2.5);
+  const ctaD = wordsToFrames(cta, fps, 3.5);
+  const logoD = Math.round(3.0 * fps);
 
   return (
     <ThemeProvider theme={themeObj}>
       <AbsoluteFill style={{ fontFamily }}>
         <Background />
         <TransitionSeries>
-          <TransitionSeries.Sequence durationInFrames={bd}>
-            <BeatScene text={beat1} beatIndex={0} durationInFrames={bd} />
+          <TransitionSeries.Sequence durationInFrames={b1d}>
+            <BeatScene text={beat1} beatIndex={0} durationInFrames={b1d} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
-          <TransitionSeries.Sequence durationInFrames={bd}>
-            <BeatScene text={beat2} beatIndex={1} durationInFrames={bd} />
+          <TransitionSeries.Sequence durationInFrames={b2d}>
+            <BeatScene text={beat2} beatIndex={1} durationInFrames={b2d} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
-          <TransitionSeries.Sequence durationInFrames={bd}>
-            <BeatScene text={beat3} beatIndex={2} isHighlight durationInFrames={bd} />
+          <TransitionSeries.Sequence durationInFrames={b3d}>
+            <BeatScene text={beat3} beatIndex={2} isHighlight durationInFrames={b3d} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
-          <TransitionSeries.Sequence durationInFrames={bd}>
-            <BeatScene text={beat4} beatIndex={3} durationInFrames={bd} />
+          <TransitionSeries.Sequence durationInFrames={b4d}>
+            <BeatScene text={beat4} beatIndex={3} durationInFrames={b4d} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
-          <TransitionSeries.Sequence durationInFrames={cd}>
-            <CtaBeatScene text={cta} durationInFrames={cd} />
+          <TransitionSeries.Sequence durationInFrames={ctaD}>
+            <CtaBeatScene text={cta} durationInFrames={ctaD} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
-          <TransitionSeries.Sequence durationInFrames={ld}>
+          <TransitionSeries.Sequence durationInFrames={logoD}>
             <LogoScreen />
           </TransitionSeries.Sequence>
         </TransitionSeries>

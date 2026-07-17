@@ -21,6 +21,7 @@ import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { IntroProps } from '../types';
+import { wordsToFrames } from './Full';
 
 const SAFE_X = 80;
 
@@ -58,10 +59,10 @@ export const Intro: React.FC<IntroProps> = ({ line1, line2, tagline, cta, theme:
   const frame   = useCurrentFrame();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
-  const s1 = Math.round(4.5 * fps);
-  const s2 = Math.round(5   * fps);
-  const s3 = Math.round(4   * fps);
-  const sL = Math.round(4   * fps);
+  const s1 = wordsToFrames(`${line1} ${line2}`, fps, 4.0);
+  const s2 = wordsToFrames(tagline, fps, 4.5);
+  const s3 = wordsToFrames(cta, fps, 3.5);
+  const sL = Math.round(3.0 * fps);
 
   const bgIconOpacity = interpolate(frame, [0, 50], [0, 0.03], { extrapolateRight: 'clamp' });
 
