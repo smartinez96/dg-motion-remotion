@@ -176,14 +176,26 @@ app.post('/render', async (req, res) => {
     const durationOverride =
       type === 'carousel' ? getCarouselDuration(inputProps.slides) : undefined;
 
+    const withTimeout = (promise, label, ms) =>
+      Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
+        ),
+      ]);
+
     console.log('[render] calling selectComposition...');
-    const composition = await selectComposition({
-      serveUrl,
-      id: compositionId,
-      inputProps,
-      browserExecutable: BROWSER_EXECUTABLE,
-      chromiumOptions: CHROMIUM_OPTIONS,
-    });
+    const composition = await withTimeout(
+      selectComposition({
+        serveUrl,
+        id: compositionId,
+        inputProps,
+        browserExecutable: BROWSER_EXECUTABLE,
+        chromiumOptions: CHROMIUM_OPTIONS,
+      }),
+      'selectComposition',
+      45_000
+    );
     console.log(`[render] composition selected: ${compositionId} (${composition.durationInFrames}f)`);
 
     if (durationOverride) {
@@ -191,15 +203,19 @@ app.post('/render', async (req, res) => {
     }
 
     console.log('[render] calling renderMedia...');
-    await renderMedia({
-      composition,
-      serveUrl,
-      codec: 'h264',
-      outputLocation: outputPath,
-      inputProps,
-      browserExecutable: BROWSER_EXECUTABLE,
-      chromiumOptions: CHROMIUM_OPTIONS,
-    });
+    await withTimeout(
+      renderMedia({
+        composition,
+        serveUrl,
+        codec: 'h264',
+        outputLocation: outputPath,
+        inputProps,
+        browserExecutable: BROWSER_EXECUTABLE,
+        chromiumOptions: CHROMIUM_OPTIONS,
+      }),
+      'renderMedia',
+      250_000
+    );
 
     clearTimeout(timeoutHandle);
     const videoUrl = `${PUBLIC_BASE_URL}/output/${filename}`;
