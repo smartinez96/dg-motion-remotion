@@ -48,7 +48,7 @@ async function getBundle() {
 const BROWSER_EXECUTABLE = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
 const CHROMIUM_OPTIONS = {
   disableWebSecurity: true,
-  gl: 'swangle',
+  gl: 'angle',
   enableMultiProcessOnLinux: false,
 };
 

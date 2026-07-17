@@ -16,9 +16,11 @@ ensureBrowser({ logLevel: 'verbose' })
 
     console.log('Chrome binary at:', result.path);
 
+    // --disable-gpu conflicts with gl:swangle (software renderer) in newer Chrome versions.
+    // swangle handles GPU-less rendering internally — don't force-disable GPU at OS level.
     const wrapper = [
       '#!/bin/sh',
-      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"`,
+      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage "$@"`,
       '',
     ].join('\n');
 
