@@ -164,12 +164,19 @@ app.post('/render', async (req, res) => {
   const outputPath = path.join(OUTPUT_DIR, filename);
   const inputProps = buildInputProps(type, content);
 
+  const RENDER_TIMEOUT_MS = 300_000; // 5 min hard limit
+  const timeoutHandle = setTimeout(() => {
+    if (!res.headersSent) res.status(500).json({ error: 'Render timed out after 5 minutes' });
+  }, RENDER_TIMEOUT_MS);
+
   try {
     const serveUrl = await getBundle();
+    console.log(`[render] bundle=${serveUrl} type=${type}`);
 
     const durationOverride =
       type === 'carousel' ? getCarouselDuration(inputProps.slides) : undefined;
 
+    console.log('[render] calling selectComposition...');
     const composition = await selectComposition({
       serveUrl,
       id: compositionId,
@@ -177,11 +184,13 @@ app.post('/render', async (req, res) => {
       browserExecutable: BROWSER_EXECUTABLE,
       chromiumOptions: CHROMIUM_OPTIONS,
     });
+    console.log(`[render] composition selected: ${compositionId} (${composition.durationInFrames}f)`);
 
     if (durationOverride) {
       composition.durationInFrames = durationOverride;
     }
 
+    console.log('[render] calling renderMedia...');
     await renderMedia({
       composition,
       serveUrl,
@@ -192,9 +201,10 @@ app.post('/render', async (req, res) => {
       chromiumOptions: CHROMIUM_OPTIONS,
     });
 
+    clearTimeout(timeoutHandle);
     const videoUrl = `${PUBLIC_BASE_URL}/output/${filename}`;
     console.log('Rendered:', videoUrl);
-    res.json({ url: videoUrl, filename });
+    if (!res.headersSent) res.json({ url: videoUrl, filename });
 
     // Cleanup old files (keep last 20)
     const files = fs.readdirSync(OUTPUT_DIR)
@@ -206,8 +216,9 @@ app.post('/render', async (req, res) => {
       try { fs.unlinkSync(path.join(OUTPUT_DIR, f.name)); } catch (_) {}
     });
   } catch (err) {
+    clearTimeout(timeoutHandle);
     console.error('Render error:', err);
-    res.status(500).json({ error: err.message });
+    if (!res.headersSent) res.status(500).json({ error: err.message });
   }
 });
 
@@ -298,7 +309,12 @@ app.post('/files/upload', (req, res) => {
   }
 });
 
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/health', (_req, res) => res.json({
+  status: 'ok',
+  bundleReady: !!bundleLocation,
+  bundlePath: bundleLocation,
+  prebundleExists: fs.existsSync(PREBUNDLE_PATH),
+}));
 
 app.listen(PORT, async () => {
   console.log(`DG Render Server running on port ${PORT}`);
