@@ -55,13 +55,13 @@ export const RemotionRoot: React.FC = () => {
         component={Full}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
-          const hookF = wordsToFrames(props.hook, FPS, 4.5);
-          const s1F   = wordsToFrames(`${props.scene1_titulo} ${props.scene1_cuerpo}`, FPS, 4.5);
-          const s2F   = wordsToFrames(`${props.scene2_titulo} ${props.scene2_cuerpo}`, FPS, 4.5);
-          const s3F   = wordsToFrames(`${props.scene3_titulo} ${props.scene3_cuerpo}`, FPS, 4.5);
-          const s4F   = wordsToFrames(`${props.scene4_titulo} ${props.scene4_cuerpo}`, FPS, 4.5);
-          const ctaF  = wordsToFrames(props.cta, FPS, 5.0);
-          const logoF = Math.round(3.5 * FPS);
+          const hookF = wordsToFrames(props.hook, FPS, 4.0);
+          const s1F   = wordsToFrames(`${props.scene1_titulo} ${props.scene1_cuerpo}`, FPS, 3.8);
+          const s2F   = wordsToFrames(`${props.scene2_titulo} ${props.scene2_cuerpo}`, FPS, 3.8);
+          const s3F   = wordsToFrames(`${props.scene3_titulo} ${props.scene3_cuerpo}`, FPS, 3.8);
+          const s4F   = wordsToFrames(`${props.scene4_titulo} ${props.scene4_cuerpo}`, FPS, 3.8);
+          const ctaF  = wordsToFrames(props.cta, FPS, 4.5);
+          const logoF = Math.round(3.0 * FPS);
           return {
             durationInFrames: hookF + s1F + s2F + s3F + s4F + ctaF + logoF - 6 * SETTLE,
             props,

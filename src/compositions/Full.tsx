@@ -37,7 +37,7 @@ const SAFE_X = 70;
 
 export const wordsToFrames = (text: string, fps: number, minSecs = 4.0): number => {
   const words = (text || '').trim().split(/\s+/).filter(Boolean).length;
-  return Math.round(Math.max(minSecs, words * 0.38) * fps);
+  return Math.round(Math.max(minSecs, words * 0.32) * fps);
 };
 
 // ─── Dolor → phone variant mapping ───────────────────────────────────────────
@@ -259,13 +259,13 @@ export const Full: React.FC<FullProps> = ({
 
   const phones = DOLOR_PHONES[(dolor || '').toUpperCase()] ?? DEFAULT_PHONES;
 
-  const hookDuration = wordsToFrames(hook, fps, 4.5);
-  const s1Duration   = wordsToFrames(`${scene1_titulo} ${scene1_cuerpo}`, fps, 4.5);
-  const s2Duration   = wordsToFrames(`${scene2_titulo} ${scene2_cuerpo}`, fps, 4.5);
-  const s3Duration   = wordsToFrames(`${scene3_titulo} ${scene3_cuerpo}`, fps, 4.5);
-  const s4Duration   = wordsToFrames(`${scene4_titulo} ${scene4_cuerpo}`, fps, 4.5);
-  const ctaDuration  = wordsToFrames(cta, fps, 5.0);
-  const logoDuration = Math.round(3.5 * fps);
+  const hookDuration = wordsToFrames(hook, fps, 4.0);
+  const s1Duration   = wordsToFrames(`${scene1_titulo} ${scene1_cuerpo}`, fps, 3.8);
+  const s2Duration   = wordsToFrames(`${scene2_titulo} ${scene2_cuerpo}`, fps, 3.8);
+  const s3Duration   = wordsToFrames(`${scene3_titulo} ${scene3_cuerpo}`, fps, 3.8);
+  const s4Duration   = wordsToFrames(`${scene4_titulo} ${scene4_cuerpo}`, fps, 3.8);
+  const ctaDuration  = wordsToFrames(cta, fps, 4.5);
+  const logoDuration = Math.round(3.0 * fps);
 
   return (
     <ThemeProvider theme={themeObj}>

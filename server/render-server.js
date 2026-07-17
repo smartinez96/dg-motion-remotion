@@ -164,9 +164,9 @@ app.post('/render', async (req, res) => {
   const outputPath = path.join(OUTPUT_DIR, filename);
   const inputProps = buildInputProps(type, content);
 
-  const RENDER_TIMEOUT_MS = 660_000; // 11 min hard limit
+  const RENDER_TIMEOUT_MS = 850_000; // 14 min — just under n8n's 900s limit
   const timeoutHandle = setTimeout(() => {
-    if (!res.headersSent) res.status(500).json({ error: 'Render timed out after 11 minutes' });
+    if (!res.headersSent) res.status(500).json({ error: 'Render timed out after 14 minutes' });
   }, RENDER_TIMEOUT_MS);
 
   try {
@@ -221,7 +221,7 @@ app.post('/render', async (req, res) => {
         },
       }),
       'renderMedia',
-      600_000
+      820_000
     );
 
     clearTimeout(timeoutHandle);
