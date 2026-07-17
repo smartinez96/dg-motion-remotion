@@ -344,6 +344,27 @@ app.get('/debug/chrome', (req, res) => {
   });
 });
 
+// Diagnostic: test selectComposition with 12s timeout
+app.get('/debug/select', async (req, res) => {
+  res.setTimeout(20000);
+  try {
+    const serveUrl = await getBundle();
+    const result = await Promise.race([
+      selectComposition({
+        serveUrl,
+        id: 'DG-Stats',
+        inputProps: { hook: 'test', stat1: { number: '1%', label: 'test' }, stat2: { number: '2x', label: 'test' }, insight: 'test', cta: 'test', theme: 'dark' },
+        browserExecutable: BROWSER_EXECUTABLE,
+        chromiumOptions: CHROMIUM_OPTIONS,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('selectComposition timed out 12s')), 12000)),
+    ]);
+    res.json({ success: true, fps: result.fps, durationInFrames: result.durationInFrames });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack?.slice(0, 800) });
+  }
+});
+
 app.get('/health', (_req, res) => res.json({
   status: 'ok',
   bundleReady: !!bundleLocation,
