@@ -211,6 +211,8 @@ app.post('/render', async (req, res) => {
         outputLocation: outputPath,
         inputProps,
         concurrency: 1,
+        imageFormat: 'jpeg',
+        jpegQuality: 90,
         browserExecutable: BROWSER_EXECUTABLE,
         chromiumOptions: CHROMIUM_OPTIONS,
         onProgress: ({ progress }) => {
@@ -348,6 +350,33 @@ app.get('/debug/chrome', (req, res) => {
       error: err?.message,
     });
   });
+});
+
+// Diagnostic: render only first 30 frames to measure rendering speed
+app.get('/debug/render-speed', async (req, res) => {
+  res.setTimeout(120000);
+  try {
+    const serveUrl = await getBundle();
+    const testProps = { hook: 'test', stat1: { number: '1%', label: 't' }, stat2: { number: '2x', label: 't' }, insight: 'test', cta: 'test', theme: 'dark' };
+    const composition = await selectComposition({
+      serveUrl, id: 'DG-Stats', inputProps: testProps,
+      browserExecutable: BROWSER_EXECUTABLE, chromiumOptions: CHROMIUM_OPTIONS,
+    });
+    composition.durationInFrames = 30;
+
+    const t0 = Date.now();
+    const tmpOut = path.join(OUTPUT_DIR, `debug-speed-${Date.now()}.mp4`);
+    await renderMedia({
+      composition, serveUrl, codec: 'h264', outputLocation: tmpOut,
+      inputProps: testProps, concurrency: 1, imageFormat: 'jpeg',
+      browserExecutable: BROWSER_EXECUTABLE, chromiumOptions: CHROMIUM_OPTIONS,
+    });
+    const elapsed = Date.now() - t0;
+    try { fs.unlinkSync(tmpOut); } catch (_) {}
+    res.json({ frames: 30, elapsedMs: elapsed, msPerFrame: Math.round(elapsed / 30), estimatedFullStats: `${Math.round((elapsed / 30 * 745) / 1000)}s` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Diagnostic: test selectComposition with 12s timeout
