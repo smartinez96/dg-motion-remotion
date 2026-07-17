@@ -164,9 +164,9 @@ app.post('/render', async (req, res) => {
   const outputPath = path.join(OUTPUT_DIR, filename);
   const inputProps = buildInputProps(type, content);
 
-  const RENDER_TIMEOUT_MS = 300_000; // 5 min hard limit
+  const RENDER_TIMEOUT_MS = 660_000; // 11 min hard limit
   const timeoutHandle = setTimeout(() => {
-    if (!res.headersSent) res.status(500).json({ error: 'Render timed out after 5 minutes' });
+    if (!res.headersSent) res.status(500).json({ error: 'Render timed out after 11 minutes' });
   }, RENDER_TIMEOUT_MS);
 
   try {
@@ -210,11 +210,17 @@ app.post('/render', async (req, res) => {
         codec: 'h264',
         outputLocation: outputPath,
         inputProps,
+        concurrency: 1,
         browserExecutable: BROWSER_EXECUTABLE,
         chromiumOptions: CHROMIUM_OPTIONS,
+        onProgress: ({ progress }) => {
+          if (Math.round(progress * 100) % 10 === 0) {
+            console.log(`[render] progress: ${Math.round(progress * 100)}%`);
+          }
+        },
       }),
       'renderMedia',
-      250_000
+      600_000
     );
 
     clearTimeout(timeoutHandle);
