@@ -210,7 +210,6 @@ app.post('/render', async (req, res) => {
         codec: 'h264',
         outputLocation: outputPath,
         inputProps,
-        concurrency: 1,
         imageFormat: 'jpeg',
         jpegQuality: 90,
         browserExecutable: BROWSER_EXECUTABLE,
@@ -368,7 +367,7 @@ app.get('/debug/render-speed', async (req, res) => {
     const tmpOut = path.join(OUTPUT_DIR, `debug-speed-${Date.now()}.mp4`);
     await renderMedia({
       composition, serveUrl, codec: 'h264', outputLocation: tmpOut,
-      inputProps: testProps, concurrency: 1, imageFormat: 'jpeg',
+      inputProps: testProps, imageFormat: 'jpeg',
       browserExecutable: BROWSER_EXECUTABLE, chromiumOptions: CHROMIUM_OPTIONS,
     });
     const elapsed = Date.now() - t0;
