@@ -16,12 +16,12 @@ ensureBrowser({ logLevel: 'verbose' })
 
     console.log('Chrome binary at:', result.path);
 
-    // swangle = software WebGL renderer, works without real GPU in Docker.
-    // --no-zygote prevents the zygote process model which is unstable in resource-limited containers.
-    // --disable-dev-shm-usage avoids /dev/shm exhaustion (Docker default is 64MB).
+    // --disable-gpu disables Chrome's GPU process, forcing the native CSS software compositor.
+    // Our compositions are pure CSS/React — no WebGL needed. The CSS compositor is much faster
+    // than SwiftShader (software GPU emulator) for HTML/CSS rendering in a Docker container.
     const wrapper = [
       '#!/bin/sh',
-      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --no-zygote "$@"`,
+      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --disable-gpu "$@"`,
       '',
     ].join('\n');
 
