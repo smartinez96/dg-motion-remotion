@@ -16,11 +16,12 @@ ensureBrowser({ logLevel: 'verbose' })
 
     console.log('Chrome binary at:', result.path);
 
-    // --disable-gpu conflicts with gl:swangle (software renderer) in newer Chrome versions.
-    // swangle handles GPU-less rendering internally — don't force-disable GPU at OS level.
+    // swangle = software WebGL renderer, works without real GPU in Docker.
+    // --no-zygote prevents the zygote process model which is unstable in resource-limited containers.
+    // --disable-dev-shm-usage avoids /dev/shm exhaustion (Docker default is 64MB).
     const wrapper = [
       '#!/bin/sh',
-      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage "$@"`,
+      `exec ${result.path} --no-sandbox --disable-setuid-sandbox --disable-dev-shm-usage --no-zygote "$@"`,
       '',
     ].join('\n');
 
