@@ -325,6 +325,25 @@ app.post('/files/upload', (req, res) => {
   }
 });
 
+// Diagnostic: launch Chrome directly and return version + exit info
+app.get('/debug/chrome', (req, res) => {
+  const { execFile } = require('child_process');
+  const chromePath = BROWSER_EXECUTABLE;
+  const args = ['--version', '--no-sandbox', '--disable-setuid-sandbox'];
+
+  res.setTimeout(15000);
+  execFile(chromePath, args, { timeout: 10000 }, (err, stdout, stderr) => {
+    res.json({
+      chromePath,
+      exists: fs.existsSync(chromePath),
+      stdout: stdout?.trim(),
+      stderr: stderr?.trim().slice(0, 500),
+      exitCode: err?.code ?? 0,
+      error: err?.message,
+    });
+  });
+});
+
 app.get('/health', (_req, res) => res.json({
   status: 'ok',
   bundleReady: !!bundleLocation,
