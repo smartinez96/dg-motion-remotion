@@ -37,7 +37,7 @@ const SAFE_X = 70;
 
 export const wordsToFrames = (text: string, fps: number, minSecs = 4.0): number => {
   const words = (text || '').trim().split(/\s+/).filter(Boolean).length;
-  return Math.round(Math.max(minSecs, words * 0.32) * fps);
+  return Math.round(Math.max(minSecs, words * 0.28) * fps);
 };
 
 // ─── Dolor → phone variant mapping ───────────────────────────────────────────
