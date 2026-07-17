@@ -10,7 +10,7 @@ import { TransitionSeries } from '@remotion/transitions';
 import { Background } from '../components/Background';
 import { Badge, RichText } from '../components/SceneText';
 import { LogoScreen } from '../components/LogoScreen';
-import { sceneSettle, TIMING_SETTLE } from '../components/SceneTransition';
+import { sceneSlide, sceneSettle, TIMING_SETTLE } from '../components/SceneTransition';
 import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider, useTheme } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
@@ -44,7 +44,88 @@ const BeatDots: React.FC<{ current: number }> = ({ current }) => {
   );
 };
 
-// Beat genérico — texto puro centrado con flash-in
+// Card contenedor — cabecera con counter + barra de progreso + cuerpo
+const BeatCard: React.FC<{
+  beatIndex: number;
+  durationInFrames: number;
+  glow?: number;
+  children: React.ReactNode;
+}> = ({ beatIndex, durationInFrames, glow = 0, children }) => {
+  const frame = useCurrentFrame();
+  const theme = useTheme();
+  const isDark = theme.mode === 'dark';
+
+  const cardBg  = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+  const hdrBg   = isDark ? 'rgba(255,107,26,0.14)'  : 'rgba(255,107,26,0.10)';
+  const counter = `${String(beatIndex + 1).padStart(2, '0')} / ${String(TOTAL_BEATS).padStart(2, '0')}`;
+  const cardGlow = glow > 0
+    ? `0 0 ${24 + glow * 14}px rgba(255,107,26,${0.16 + glow * 0.10})`
+    : 'none';
+
+  // Barra de progreso: se llena proporcionalmente al frame actual del beat
+  const fillPct = Math.min(100, (frame / durationInFrames) * 100);
+
+  return (
+    <div style={{
+      width: '100%',
+      borderRadius: 28,
+      border: '1.5px solid rgba(255,107,26,0.40)',
+      background: cardBg,
+      overflow: 'hidden',
+      boxShadow: cardGlow,
+    }}>
+      {/* Cabecera — counter + barra de progreso */}
+      <div style={{
+        background: hdrBg,
+        padding: '24px 40px 18px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 14,
+        borderBottom: '1px solid rgba(255,107,26,0.20)',
+      }}>
+        <span style={{
+          fontFamily,
+          fontSize: 30,
+          fontWeight: 800,
+          color: TOKENS.accentPrimary,
+          letterSpacing: 6,
+          lineHeight: 1,
+        }}>
+          {counter}
+        </span>
+        {/* Track */}
+        <div style={{
+          width: '100%',
+          height: 3,
+          borderRadius: 2,
+          backgroundColor: 'rgba(255,107,26,0.20)',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            height: '100%',
+            width: `${fillPct}%`,
+            borderRadius: 2,
+            backgroundColor: TOKENS.accentPrimary,
+            boxShadow: '0 0 6px rgba(255,107,26,0.60)',
+          }} />
+        </div>
+      </div>
+      {/* Cuerpo */}
+      <div style={{
+        padding: '44px 52px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 28,
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// Beat genérico — slide-up de entrada + card con cabecera
 const BeatScene: React.FC<{
   text: string;
   beatIndex: number;
@@ -58,7 +139,11 @@ const BeatScene: React.FC<{
     extrapolateRight: 'clamp',
     easing: Easing.out(Easing.cubic),
   });
-  const scale = interpolate(frame, [0, 16], [0.91, 1], {
+  const scale = interpolate(frame, [0, 18], [0.94, 1], {
+    extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const translateY = interpolate(frame, [0, 18], [28, 0], {
     extrapolateRight: 'clamp',
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
@@ -78,41 +163,45 @@ const BeatScene: React.FC<{
       <BeatDots current={beatIndex} />
 
       <div style={{
-        opacity, transform: `scale(${scale})`,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28,
-        filter: isHighlight
-          ? `drop-shadow(0 0 ${22 + glow * 12}px rgba(255,107,26,${0.22 + glow * 0.16}))`
-          : undefined,
+        opacity,
+        transform: `translateY(${translateY}px) scale(${scale})`,
+        width: '100%',
       }}>
-        {badge && <Badge text={badge} delay={0} />}
-        <RichText
-          text={text}
-          baseFontSize={isHighlight ? 100 : 88}
-          baseWeight={900}
-          delay={0}
-          textAlign="center"
-          lineHeight={1.08}
-        />
-        {isHighlight && (
-          <div style={{
-            width: 80, height: 4, borderRadius: 2,
-            backgroundColor: TOKENS.accentPrimary,
-            transformOrigin: 'center',
-            transform: `scaleX(${lineScale})`,
-            boxShadow: `0 0 ${14 + glow * 10}px rgba(255,107,26,${0.55 + glow * 0.30})`,
-          }} />
-        )}
+        <BeatCard beatIndex={beatIndex} durationInFrames={durationInFrames} glow={glow}>
+          {badge && <Badge text={badge} delay={0} />}
+          <RichText
+            text={text}
+            baseFontSize={54}
+            baseWeight={800}
+            delay={0}
+            textAlign="center"
+            lineHeight={1.30}
+          />
+          {isHighlight && (
+            <div style={{
+              width: 80, height: 4, borderRadius: 2,
+              backgroundColor: TOKENS.accentPrimary,
+              transformOrigin: 'center',
+              transform: `scaleX(${lineScale})`,
+              boxShadow: `0 0 ${14 + glow * 10}px rgba(255,107,26,${0.55 + glow * 0.30})`,
+            }} />
+          )}
+        </BeatCard>
       </div>
     </AbsoluteFill>
   );
 };
 
-// CTA beat — texto + handle + badge de acción
+// CTA beat — slide-up de entrada + card 05/05 + badge + handle animado
 const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => {
   const frame = useCurrentFrame();
 
   const opacity = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
-  const scale   = interpolate(frame, [0, 16], [0.91, 1], {
+  const scale   = interpolate(frame, [0, 18], [0.94, 1], {
+    extrapolateRight: 'clamp',
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const translateY = interpolate(frame, [0, 18], [28, 0], {
     extrapolateRight: 'clamp',
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
@@ -135,18 +224,23 @@ const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ te
       <BeatDots current={4} />
 
       <div style={{
-        opacity, transform: `scale(${scale})`,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40,
+        opacity,
+        transform: `translateY(${translateY}px) scale(${scale})`,
+        width: '100%',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32,
       }}>
-        <Badge text="DA EL PRIMER PASO" delay={0} />
-        <RichText
-          text={text}
-          baseFontSize={84}
-          baseWeight={900}
-          delay={0}
-          textAlign="center"
-          lineHeight={1.1}
-        />
+        <BeatCard beatIndex={4} durationInFrames={durationInFrames}>
+          <Badge text="DA EL PRIMER PASO" delay={0} />
+          <RichText
+            text={text}
+            baseFontSize={54}
+            baseWeight={800}
+            delay={0}
+            textAlign="center"
+            lineHeight={1.30}
+          />
+        </BeatCard>
+
         <div style={{
           opacity: pillOpacity, transform: `scale(${pillScale})`,
           padding: '18px 44px', borderRadius: 100,
@@ -184,22 +278,22 @@ export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, the
           <TransitionSeries.Sequence durationInFrames={b1d}>
             <BeatScene text={beat1} beatIndex={0} durationInFrames={b1d} />
           </TransitionSeries.Sequence>
-          <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
+          <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={b2d}>
             <BeatScene text={beat2} beatIndex={1} durationInFrames={b2d} />
           </TransitionSeries.Sequence>
-          <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
+          <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={b3d}>
             <BeatScene text={beat3} beatIndex={2} isHighlight durationInFrames={b3d} />
           </TransitionSeries.Sequence>
-          <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
+          <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={b4d}>
             <BeatScene text={beat4} beatIndex={3} durationInFrames={b4d} />
           </TransitionSeries.Sequence>
-          <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
+          <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={ctaD}>
             <CtaBeatScene text={cta} durationInFrames={ctaD} />
