@@ -93,20 +93,9 @@ const WipeComponent: React.FC<TransitionPresentationComponentProps<Record<string
 
   if (entering) {
     const clipRight = (1 - presentationProgress) * 100;
-    const barPos    = presentationProgress * 100;
     return (
-      <AbsoluteFill>
-        <AbsoluteFill style={{ clipPath: `inset(0 ${clipRight.toFixed(2)}% 0 0)` }}>
-          {children}
-        </AbsoluteFill>
-        <div style={{
-          position: 'absolute', top: 0, bottom: 0,
-          left: `${Math.max(0, barPos - 3.5).toFixed(2)}%`,
-          width: '7%',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,107,26,0.88) 38%, rgba(255,107,26,0.68) 72%, transparent 100%)',
-          boxShadow: '0 0 18px rgba(255,107,26,0.35)',
-          pointerEvents: 'none',
-        }} />
+      <AbsoluteFill style={{ clipPath: `inset(0 ${clipRight.toFixed(2)}% 0 0)` }}>
+        {children}
       </AbsoluteFill>
     );
   }
