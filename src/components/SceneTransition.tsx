@@ -79,7 +79,53 @@ export const sceneSlide = (
   props: { direction },
 });
 
+// ─── Wipe: barrido naranja de izquierda a derecha ───────────────────────────
+// La barra naranja (color de marca) barre la pantalla revelando la nueva escena.
+// Entering: clip-path revela de izquierda a derecha + barra naranja en el borde.
+// Exiting: clip-path oculta de izquierda a derecha.
+
+const WipeComponent: React.FC<TransitionPresentationComponentProps<Record<string, never>>> = ({
+  children,
+  presentationDirection,
+  presentationProgress,
+}) => {
+  const entering = presentationDirection === 'entering';
+
+  if (entering) {
+    const clipRight = (1 - presentationProgress) * 100;
+    const barPos    = presentationProgress * 100;
+    return (
+      <AbsoluteFill>
+        <AbsoluteFill style={{ clipPath: `inset(0 ${clipRight.toFixed(2)}% 0 0)` }}>
+          {children}
+        </AbsoluteFill>
+        <div style={{
+          position: 'absolute', top: 0, bottom: 0,
+          left: `${Math.max(0, barPos - 3.5).toFixed(2)}%`,
+          width: '7%',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,107,26,0.88) 38%, rgba(255,107,26,0.68) 72%, transparent 100%)',
+          boxShadow: '0 0 18px rgba(255,107,26,0.35)',
+          pointerEvents: 'none',
+        }} />
+      </AbsoluteFill>
+    );
+  }
+
+  const clipLeft = presentationProgress * 100;
+  return (
+    <AbsoluteFill style={{ clipPath: `inset(0 0 0 ${clipLeft.toFixed(2)}%)` }}>
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+export const sceneWipe = (): TransitionPresentation<Record<string, never>> => ({
+  component: WipeComponent,
+  props: {},
+});
+
 // ─── Timings estándar ────────────────────────────────────────────────────────
 
 export const TIMING_SETTLE = linearTiming({ durationInFrames: 10 });
 export const TIMING_FAST   = linearTiming({ durationInFrames: 7 });
+export const TIMING_WIPE   = linearTiming({ durationInFrames: 16 });
