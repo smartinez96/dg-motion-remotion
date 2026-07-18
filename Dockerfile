@@ -43,6 +43,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+LABEL build.version="20260717-2"
 COPY . .
 
 # Pre-build the Remotion webpack bundle at image build time.
