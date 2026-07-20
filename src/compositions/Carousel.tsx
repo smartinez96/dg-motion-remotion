@@ -91,8 +91,9 @@ export const Carousel: React.FC<CarouselProps> = ({ slides, title, theme: themeN
     );
   }
 
+  const MAX_SLIDE_FRAMES = Math.round(fps * 8); // cap at 8s per slide
   const slideDurations = slides.map(s =>
-    wordsToFrames(`${s.headline} ${s.body}`, fps, 4.0)
+    Math.min(wordsToFrames(`${s.headline} ${s.body}`, fps, 4.0), MAX_SLIDE_FRAMES)
   );
   const logoDuration = Math.round(3.0 * fps);
 
