@@ -9,6 +9,8 @@ export type StatsProps = {
   stat2: StatItem;
   insight: string;
   cta: string;
+  lead_magnet_label?: string;
+  dolor?: string;
   badge?: string;
   theme?: 'dark' | 'light';
 };
@@ -32,6 +34,7 @@ export type FullProps = {
   scene4_titulo: string;
   scene4_cuerpo: string;
   cta: string;
+  lead_magnet_label?: string;
   dolor?: string;
   theme?: 'dark' | 'light';
 };
@@ -53,6 +56,8 @@ export type ReelProps = {
   beat3: string;
   beat4: string;
   cta: string;
+  lead_magnet_label?: string;
+  dolor?: string;
   theme?: 'dark' | 'light';
 };
 
@@ -61,7 +66,8 @@ export type KeywordProps = {
   problema: string;
   prueba: string;
   cta: string;
-  lead_magnet_label: string;
+  lead_magnet_label?: string;
+  dolor?: string;
   theme?: 'dark' | 'light';
 };
 

@@ -16,6 +16,7 @@ import { ThemeProvider, useTheme } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { ReelProps } from '../types';
 import { wordsToFrames } from './Full';
+import { getLeadMagnetLabel } from '../leadMagnetLabels';
 
 const TOTAL_BEATS = 5;
 
@@ -193,7 +194,7 @@ const BeatScene: React.FC<{
 };
 
 // CTA beat — slide-up de entrada + card 05/05 + badge + handle animado
-const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => {
+const CtaBeatScene: React.FC<{ text: string; label: string; durationInFrames: number }> = ({ text, label, durationInFrames }) => {
   const frame = useCurrentFrame();
 
   const opacity = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
@@ -241,6 +242,21 @@ const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ te
           />
         </BeatCard>
 
+        {label ? (
+          <div style={{
+            opacity: pillOpacity, transform: `scale(${pillScale})`,
+            padding: '14px 28px', borderRadius: 14,
+            backgroundColor: 'rgba(255,107,26,0.07)',
+            border: '1px solid rgba(255,107,26,0.22)',
+            fontSize: 24, fontWeight: 600,
+            color: 'rgba(255,255,255,0.62)',
+            textAlign: 'center' as const,
+            maxWidth: 820, lineHeight: 1.4,
+          }}>
+            {label}
+          </div>
+        ) : null}
+
         <div style={{
           opacity: pillOpacity, transform: `scale(${pillScale})`,
           padding: '18px 44px', borderRadius: 100,
@@ -260,14 +276,15 @@ const CtaBeatScene: React.FC<{ text: string; durationInFrames: number }> = ({ te
 
 // ─── Composition ─────────────────────────────────────────────────────────────
 
-export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, theme: themeName = 'dark' }) => {
+export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, lead_magnet_label = '', dolor = '', theme: themeName = 'dark' }) => {
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const { fps } = useVideoConfig();
+  const label = getLeadMagnetLabel(lead_magnet_label, dolor);
   const b1d = wordsToFrames(beat1, fps, 2.5);
   const b2d = wordsToFrames(beat2, fps, 2.5);
   const b3d = wordsToFrames(beat3, fps, 2.5);
   const b4d = wordsToFrames(beat4, fps, 2.5);
-  const ctaD = wordsToFrames(cta, fps, 3.5);
+  const ctaD = wordsToFrames(`${cta} ${label}`, fps, 4.5);
   const logoD = Math.round(3.0 * fps);
 
   return (
@@ -296,7 +313,7 @@ export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, the
           <TransitionSeries.Transition presentation={sceneSlide('from-right')} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={ctaD}>
-            <CtaBeatScene text={cta} durationInFrames={ctaD} />
+            <CtaBeatScene text={cta} label={label} durationInFrames={ctaD} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 

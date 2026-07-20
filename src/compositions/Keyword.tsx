@@ -16,6 +16,7 @@ import { ThemeProvider } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { KeywordProps } from '../types';
 import { wordsToFrames } from './Full';
+import { getLeadMagnetLabel } from '../leadMagnetLabels';
 
 const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text }) => {
   const frame = useCurrentFrame();
@@ -113,14 +114,15 @@ const CtaScene: React.FC<{ cta: string; lead_magnet_label: string; durationInFra
 };
 
 export const Keyword: React.FC<KeywordProps> = ({
-  hook, problema, prueba, cta, lead_magnet_label, theme: themeName = 'dark',
+  hook, problema, prueba, cta, lead_magnet_label = '', dolor = '', theme: themeName = 'dark',
 }) => {
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const { fps } = useVideoConfig();
+  const label = getLeadMagnetLabel(lead_magnet_label, dolor);
   const hd = wordsToFrames(hook, fps, 3.0);
   const pd = wordsToFrames(problema, fps, 3.0);
   const rd = wordsToFrames(prueba, fps, 3.0);
-  const cd = wordsToFrames(`${cta} ${lead_magnet_label}`, fps, 3.5);
+  const cd = wordsToFrames(`${cta} ${label}`, fps, 4.5);
   const ld = Math.round(3.0 * fps);
 
   return (
@@ -144,7 +146,7 @@ export const Keyword: React.FC<KeywordProps> = ({
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
           <TransitionSeries.Sequence durationInFrames={cd}>
-            <CtaScene cta={cta} lead_magnet_label={lead_magnet_label} durationInFrames={cd} />
+            <CtaScene cta={cta} lead_magnet_label={label} durationInFrames={cd} />
           </TransitionSeries.Sequence>
           <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 

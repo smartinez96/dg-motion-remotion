@@ -30,6 +30,7 @@ import { TOKENS, fontFamily } from '../fonts';
 import { ThemeProvider, useTheme } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { FullProps } from '../types';
+import { getLeadMagnetLabel } from '../leadMagnetLabels';
 
 const SAFE_X = 70;
 
@@ -220,9 +221,11 @@ const HookScene: React.FC<{ text: string; durationInFrames: number }> = ({ text 
 
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 
-const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => {
+const CtaScene: React.FC<{ text: string; label: string; durationInFrames: number }> = ({ text, label, durationInFrames }) => {
   const frame = useCurrentFrame();
-  const glowPulse = 0.5 + Math.sin(frame / 28) * 0.5;
+  const glowPulse   = 0.5 + Math.sin(frame / 28) * 0.5;
+  const labelOpacity = interpolate(frame, [22, 36], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const labelScale   = interpolate(frame, [22, 36], [0.90, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
 
   return (
     <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
@@ -230,10 +233,24 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
         <IconBadge icon="check" size={200} variant="solid" delay={6} shape="circle" />
       </div>
       <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
-        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 36 }}>
-          <Badge text="LA SOLUCIÓN" delay={0} />
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
+          <Badge text="TU TURNO" delay={0} />
           <RichText text={text} baseFontSize={60} baseWeight={800} delay={12} textAlign="center" lineHeight={1.25} />
-          <div style={{ marginTop: 8, padding: '16px 40px', borderRadius: 100, border: `1.5px solid rgba(255,107,26,${0.4 + glowPulse * 0.35})`, backgroundColor: 'rgba(255,107,26,0.10)', boxShadow: `0 0 ${16 + glowPulse * 10}px rgba(255,107,26,${0.13 + glowPulse * 0.10})`, fontSize: 22, fontWeight: 700, color: TOKENS.accentPrimary, letterSpacing: 2 }}>
+          {label ? (
+            <div style={{
+              opacity: labelOpacity, transform: `scale(${labelScale})`,
+              padding: '14px 30px', borderRadius: 14,
+              backgroundColor: 'rgba(255,107,26,0.07)',
+              border: '1px solid rgba(255,107,26,0.22)',
+              fontSize: 26, fontWeight: 600,
+              color: 'rgba(255,255,255,0.62)',
+              textAlign: 'center' as const,
+              maxWidth: 820, lineHeight: 1.4,
+            }}>
+              {label}
+            </div>
+          ) : null}
+          <div style={{ opacity: labelOpacity, transform: `scale(${labelScale})`, marginTop: label ? 0 : 8, padding: '16px 40px', borderRadius: 100, border: `1.5px solid rgba(255,107,26,${0.4 + glowPulse * 0.35})`, backgroundColor: 'rgba(255,107,26,0.10)', boxShadow: `0 0 ${16 + glowPulse * 10}px rgba(255,107,26,${0.13 + glowPulse * 0.10})`, fontSize: 22, fontWeight: 700, color: TOKENS.accentPrimary, letterSpacing: 2 }}>
             @DIGITALGROWTH.WR
           </div>
         </div>
@@ -251,6 +268,7 @@ export const Full: React.FC<FullProps> = ({
   scene3_titulo, scene3_cuerpo,
   scene4_titulo, scene4_cuerpo,
   cta,
+  lead_magnet_label = '',
   dolor = '',
   theme: themeName = 'dark',
 }) => {
@@ -258,13 +276,14 @@ export const Full: React.FC<FullProps> = ({
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
 
   const phones = DOLOR_PHONES[(dolor || '').toUpperCase()] ?? DEFAULT_PHONES;
+  const label = getLeadMagnetLabel(lead_magnet_label, dolor);
 
   const hookDuration = wordsToFrames(hook, fps, 4.0);
   const s1Duration   = wordsToFrames(`${scene1_titulo} ${scene1_cuerpo}`, fps, 3.8);
   const s2Duration   = wordsToFrames(`${scene2_titulo} ${scene2_cuerpo}`, fps, 3.8);
   const s3Duration   = wordsToFrames(`${scene3_titulo} ${scene3_cuerpo}`, fps, 3.8);
   const s4Duration   = wordsToFrames(`${scene4_titulo} ${scene4_cuerpo}`, fps, 3.8);
-  const ctaDuration  = wordsToFrames(cta, fps, 4.5);
+  const ctaDuration  = wordsToFrames(`${cta} ${label}`, fps, 4.5);
   const logoDuration = Math.round(3.0 * fps);
 
   return (
@@ -298,7 +317,7 @@ export const Full: React.FC<FullProps> = ({
         <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 
         <TransitionSeries.Sequence durationInFrames={ctaDuration}>
-          <CtaScene text={cta} durationInFrames={ctaDuration} />
+          <CtaScene text={cta} label={label} durationInFrames={ctaDuration} />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 

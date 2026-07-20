@@ -24,6 +24,7 @@ import { ThemeProvider, useTheme } from '../ThemeContext';
 import { darkTheme, lightTheme } from '../themes';
 import type { StatsProps } from '../types';
 import { wordsToFrames } from './Full';
+import { getLeadMagnetLabel } from '../leadMagnetLabels';
 
 const SAFE_X = 80;
 const TOTAL_SCENES = 5;
@@ -291,11 +292,13 @@ const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: n
 
 // ─── CTA ─────────────────────────────────────────────────────────────────────
 
-const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, durationInFrames }) => {
+const CtaScene: React.FC<{ text: string; label: string; durationInFrames: number }> = ({ text, label, durationInFrames }) => {
   const frame = useCurrentFrame();
-  const pillOpacity = interpolate(frame, [22, 36], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
-  const pillScale   = interpolate(frame, [22, 36], [0.88, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
-  const glowPulse   = 0.5 + Math.sin(frame / 28) * 0.5;
+  const pillOpacity  = interpolate(frame, [22, 36], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const pillScale    = interpolate(frame, [22, 36], [0.88, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const labelOpacity = interpolate(frame, [28, 42], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const labelScale   = interpolate(frame, [28, 42], [0.90, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
+  const glowPulse    = 0.5 + Math.sin(frame / 28) * 0.5;
 
   return (
     <AbsoluteFill style={{ fontFamily, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: SAFE_X, paddingRight: SAFE_X }}>
@@ -304,9 +307,23 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
         <IconBadge icon="check" size={180} variant="solid" delay={8} shape="circle" />
       </div>
       <SceneEnter durationInFrames={durationInFrames} exitDuration={0}>
-        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 40 }}>
-          <Badge text="LISTO PARA CRECER?" delay={0} />
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 28 }}>
+          <Badge text="TU TURNO" delay={0} />
           <RichText text={text} baseFontSize={52} baseWeight={700} delay={12} textAlign="center" lineHeight={1.3} />
+          {label ? (
+            <div style={{
+              opacity: labelOpacity, transform: `scale(${labelScale})`,
+              padding: '14px 28px', borderRadius: 14,
+              backgroundColor: 'rgba(255,107,26,0.07)',
+              border: '1px solid rgba(255,107,26,0.22)',
+              fontSize: 24, fontWeight: 600,
+              color: 'rgba(255,255,255,0.62)',
+              textAlign: 'center' as const,
+              maxWidth: 820, lineHeight: 1.4,
+            }}>
+              {label}
+            </div>
+          ) : null}
           <div style={{
             opacity: pillOpacity, transform: `scale(${pillScale})`,
             padding: '18px 44px', borderRadius: 100,
@@ -324,15 +341,16 @@ const CtaScene: React.FC<{ text: string; durationInFrames: number }> = ({ text, 
 
 // ─── Composition ─────────────────────────────────────────────────────────────
 
-export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, badge, theme: themeName = 'dark' }) => {
+export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, lead_magnet_label = '', dolor = '', badge, theme: themeName = 'dark' }) => {
   const { fps } = useVideoConfig();
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
+  const label = getLeadMagnetLabel(lead_magnet_label, dolor);
 
   const s1  = wordsToFrames(hook, fps, 4.0);
   const s2  = wordsToFrames(stat1.label, fps, 4.5);
   const s3  = wordsToFrames(stat2.label, fps, 4.5);
   const s4  = wordsToFrames(insight, fps, 4.0);
-  const s5  = wordsToFrames(cta, fps, 4.0);
+  const s5  = wordsToFrames(`${cta} ${label}`, fps, 4.5);
   const sLo = Math.round(3.0 * fps);
 
   return (
@@ -361,7 +379,7 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
         <TransitionSeries.Transition presentation={sceneWipe()} timing={TIMING_WIPE} />
 
         <TransitionSeries.Sequence durationInFrames={s5}>
-          <CtaScene text={cta} durationInFrames={s5} />
+          <CtaScene text={cta} label={label} durationInFrames={s5} />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition presentation={sceneSettle()} timing={TIMING_SETTLE} />
 

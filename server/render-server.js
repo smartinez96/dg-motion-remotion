@@ -74,6 +74,8 @@ function buildInputProps(type, content) {
       stat2: content.stat2 || { number: '0', label: '' },
       insight: content.insight || '',
       cta: content.cta || '',
+      lead_magnet_label: content.lead_magnet_label || '',
+      dolor: content.dolor || '',
       theme,
     };
   }
@@ -100,6 +102,7 @@ function buildInputProps(type, content) {
       scene4_titulo: content.scene4_titulo || '',
       scene4_cuerpo: content.scene4_cuerpo || '',
       cta: content.cta || '',
+      lead_magnet_label: content.lead_magnet_label || '',
       dolor: content.dolor || '',
       theme,
     };
@@ -112,6 +115,8 @@ function buildInputProps(type, content) {
       beat3: content.beat3 || '',
       beat4: content.beat4 || '',
       cta: content.cta || '',
+      lead_magnet_label: content.lead_magnet_label || '',
+      dolor: content.dolor || '',
       theme,
     };
   }
@@ -123,6 +128,7 @@ function buildInputProps(type, content) {
       prueba: content.prueba || '',
       cta: content.cta || '',
       lead_magnet_label: content.lead_magnet_label || '',
+      dolor: content.dolor || '',
       theme,
     };
   }
