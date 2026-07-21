@@ -119,10 +119,11 @@ export const Keyword: React.FC<KeywordProps> = ({
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const { fps } = useVideoConfig();
   const label = getLeadMagnetLabel(lead_magnet_label, dolor);
-  const hd = wordsToFrames(hook, fps, 3.0);
-  const pd = wordsToFrames(problema, fps, 3.0);
-  const rd = wordsToFrames(prueba, fps, 3.0);
-  const cd = wordsToFrames(`${cta} ${label}`, fps, 4.5);
+  const MAX_K = Math.round(fps * 7);
+  const hd = Math.min(wordsToFrames(hook, fps, 3.0), MAX_K);
+  const pd = Math.min(wordsToFrames(problema, fps, 3.0), MAX_K);
+  const rd = Math.min(wordsToFrames(prueba, fps, 3.0), MAX_K);
+  const cd = Math.min(wordsToFrames(`${cta} ${label}`, fps, 4.5), MAX_K);
   const ld = Math.round(3.0 * fps);
 
   return (

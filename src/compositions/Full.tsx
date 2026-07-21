@@ -278,12 +278,14 @@ export const Full: React.FC<FullProps> = ({
   const phones = DOLOR_PHONES[(dolor || '').toUpperCase()] ?? DEFAULT_PHONES;
   const label = getLeadMagnetLabel(lead_magnet_label, dolor);
 
-  const hookDuration = wordsToFrames(hook, fps, 4.0);
-  const s1Duration   = wordsToFrames(`${scene1_titulo} ${scene1_cuerpo}`, fps, 3.8);
-  const s2Duration   = wordsToFrames(`${scene2_titulo} ${scene2_cuerpo}`, fps, 3.8);
-  const s3Duration   = wordsToFrames(`${scene3_titulo} ${scene3_cuerpo}`, fps, 3.8);
-  const s4Duration   = wordsToFrames(`${scene4_titulo} ${scene4_cuerpo}`, fps, 3.8);
-  const ctaDuration  = wordsToFrames(`${cta} ${label}`, fps, 4.5);
+  const MAX_SCENE = Math.round(fps * 7); // cap scenes at 7s
+  const MAX_CTA   = Math.round(fps * 7);
+  const hookDuration = Math.min(wordsToFrames(hook, fps, 4.0), MAX_SCENE);
+  const s1Duration   = Math.min(wordsToFrames(`${scene1_titulo} ${scene1_cuerpo}`, fps, 3.8), MAX_SCENE);
+  const s2Duration   = Math.min(wordsToFrames(`${scene2_titulo} ${scene2_cuerpo}`, fps, 3.8), MAX_SCENE);
+  const s3Duration   = Math.min(wordsToFrames(`${scene3_titulo} ${scene3_cuerpo}`, fps, 3.8), MAX_SCENE);
+  const s4Duration   = Math.min(wordsToFrames(`${scene4_titulo} ${scene4_cuerpo}`, fps, 3.8), MAX_SCENE);
+  const ctaDuration  = Math.min(wordsToFrames(`${cta} ${label}`, fps, 4.5), MAX_CTA);
   const logoDuration = Math.round(3.0 * fps);
 
   return (

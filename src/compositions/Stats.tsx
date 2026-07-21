@@ -346,11 +346,12 @@ export const Stats: React.FC<StatsProps> = ({ hook, stat1, stat2, insight, cta, 
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const label = getLeadMagnetLabel(lead_magnet_label, dolor);
 
-  const s1  = wordsToFrames(hook, fps, 4.0);
-  const s2  = wordsToFrames(stat1.label, fps, 4.5);
-  const s3  = wordsToFrames(stat2.label, fps, 4.5);
-  const s4  = wordsToFrames(insight, fps, 4.0);
-  const s5  = wordsToFrames(`${cta} ${label}`, fps, 4.5);
+  const MAX_S = Math.round(fps * 7);
+  const s1  = Math.min(wordsToFrames(hook, fps, 4.0), MAX_S);
+  const s2  = Math.min(wordsToFrames(stat1.label, fps, 4.5), MAX_S);
+  const s3  = Math.min(wordsToFrames(stat2.label, fps, 4.5), MAX_S);
+  const s4  = Math.min(wordsToFrames(insight, fps, 4.0), MAX_S);
+  const s5  = Math.min(wordsToFrames(`${cta} ${label}`, fps, 4.5), MAX_S);
   const sLo = Math.round(3.0 * fps);
 
   return (
