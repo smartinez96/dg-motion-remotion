@@ -67,6 +67,8 @@ const PruebaScene: React.FC<{ text: string; durationInFrames: number }> = ({ tex
 
 const CtaScene: React.FC<{ cta: string; lead_magnet_label: string; durationInFrames: number }> = ({ cta, lead_magnet_label }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
+  const isDark = theme.mode === 'dark';
   const opacity     = interpolate(frame, [0, 12], [0, 1], { extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic) });
   const pillOpacity = interpolate(frame, [24, 38], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const pillScale   = interpolate(frame, [24, 38], [0.88, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
@@ -82,11 +84,11 @@ const CtaScene: React.FC<{ cta: string; lead_magnet_label: string; durationInFra
           transform: `scale(${pillScale})`,
           padding: '14px 32px',
           borderRadius: 14,
-          backgroundColor: 'rgba(255,107,26,0.07)',
-          border: '1px solid rgba(255,107,26,0.22)',
+          backgroundColor: isDark ? 'rgba(255,107,26,0.07)' : 'rgba(255,107,26,0.10)',
+          border: `1px solid rgba(255,107,26,${isDark ? '0.22' : '0.30'})`,
           fontSize: 28,
           fontWeight: 600,
-          color: 'rgba(255,255,255,0.60)',
+          color: isDark ? 'rgba(255,255,255,0.60)' : 'rgba(0,0,0,0.68)',
           textAlign: 'center' as const,
           maxWidth: 820,
           lineHeight: 1.4,

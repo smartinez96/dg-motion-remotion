@@ -196,6 +196,8 @@ const BeatScene: React.FC<{
 // CTA beat — slide-up de entrada + card 05/05 + badge + handle animado
 const CtaBeatScene: React.FC<{ text: string; label: string; durationInFrames: number }> = ({ text, label, durationInFrames }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
+  const isDark = theme.mode === 'dark';
 
   const opacity = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
   const scale   = interpolate(frame, [0, 18], [0.94, 1], {
@@ -246,10 +248,10 @@ const CtaBeatScene: React.FC<{ text: string; label: string; durationInFrames: nu
           <div style={{
             opacity: pillOpacity, transform: `scale(${pillScale})`,
             padding: '14px 28px', borderRadius: 14,
-            backgroundColor: 'rgba(255,107,26,0.07)',
-            border: '1px solid rgba(255,107,26,0.22)',
+            backgroundColor: isDark ? 'rgba(255,107,26,0.07)' : 'rgba(255,107,26,0.10)',
+            border: `1px solid rgba(255,107,26,${isDark ? '0.22' : '0.30'})`,
             fontSize: 24, fontWeight: 600,
-            color: 'rgba(255,255,255,0.62)',
+            color: isDark ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.68)',
             textAlign: 'center' as const,
             maxWidth: 820, lineHeight: 1.4,
           }}>

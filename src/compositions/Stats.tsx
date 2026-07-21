@@ -294,6 +294,8 @@ const InsightScene: React.FC<{ text: string; badge?: string; durationInFrames: n
 
 const CtaScene: React.FC<{ text: string; label: string; durationInFrames: number }> = ({ text, label, durationInFrames }) => {
   const frame = useCurrentFrame();
+  const theme = useTheme();
+  const isDark = theme.mode === 'dark';
   const pillOpacity  = interpolate(frame, [22, 36], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const pillScale    = interpolate(frame, [22, 36], [0.88, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
   const labelOpacity = interpolate(frame, [28, 42], [0, 1], { extrapolateRight: 'clamp', easing: Easing.bezier(0.16, 1, 0.3, 1) });
@@ -314,10 +316,10 @@ const CtaScene: React.FC<{ text: string; label: string; durationInFrames: number
             <div style={{
               opacity: labelOpacity, transform: `scale(${labelScale})`,
               padding: '14px 28px', borderRadius: 14,
-              backgroundColor: 'rgba(255,107,26,0.07)',
-              border: '1px solid rgba(255,107,26,0.22)',
+              backgroundColor: isDark ? 'rgba(255,107,26,0.07)' : 'rgba(255,107,26,0.10)',
+              border: `1px solid rgba(255,107,26,${isDark ? '0.22' : '0.30'})`,
               fontSize: 24, fontWeight: 600,
-              color: 'rgba(255,255,255,0.62)',
+              color: isDark ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.68)',
               textAlign: 'center' as const,
               maxWidth: 820, lineHeight: 1.4,
             }}>
