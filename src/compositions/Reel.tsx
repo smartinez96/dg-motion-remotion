@@ -280,7 +280,7 @@ export const Reel: React.FC<ReelProps> = ({ beat1, beat2, beat3, beat4, cta, lea
   const themeObj = themeName === 'light' ? lightTheme : darkTheme;
   const { fps } = useVideoConfig();
   const label = getLeadMagnetLabel(lead_magnet_label, dolor);
-  const MAX_BEAT = Math.round(fps * 5); // cap beats at 5s
+  const MAX_BEAT = Math.round(fps * 7); // cap beats at 7s
   const MAX_CTA  = Math.round(fps * 7); // cap CTA at 7s
   const b1d = Math.min(wordsToFrames(beat1, fps, 2.5), MAX_BEAT);
   const b2d = Math.min(wordsToFrames(beat2, fps, 2.5), MAX_BEAT);

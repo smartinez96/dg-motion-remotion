@@ -23,11 +23,12 @@ export const RemotionRoot: React.FC = () => {
         component={Stats}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
-          const s1  = wordsToFrames(props.hook, FPS, 4.0);
-          const s2  = wordsToFrames(props.stat1.label, FPS, 4.5);
-          const s3  = wordsToFrames(props.stat2.label, FPS, 4.5);
-          const s4  = wordsToFrames(props.insight, FPS, 4.0);
-          const s5  = wordsToFrames(props.cta, FPS, 4.0);
+          const CAP = Math.round(FPS * 7);
+          const s1  = Math.min(wordsToFrames(props.hook, FPS, 4.0), CAP);
+          const s2  = Math.min(wordsToFrames(props.stat1.label, FPS, 4.5), CAP);
+          const s3  = Math.min(wordsToFrames(props.stat2.label, FPS, 4.5), CAP);
+          const s4  = Math.min(wordsToFrames(props.insight, FPS, 4.0), CAP);
+          const s5  = Math.min(wordsToFrames(props.cta, FPS, 4.0), CAP);
           const sLo = Math.round(3.0 * FPS);
           return { durationInFrames: s1 + s2 + s3 + s4 + s5 + sLo - 5 * SETTLE, props };
         }}
@@ -73,12 +74,13 @@ export const RemotionRoot: React.FC = () => {
         component={Full}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
-          const hookF = wordsToFrames(props.hook, FPS, 4.0);
-          const s1F   = wordsToFrames(`${props.scene1_titulo} ${props.scene1_cuerpo}`, FPS, 3.8);
-          const s2F   = wordsToFrames(`${props.scene2_titulo} ${props.scene2_cuerpo}`, FPS, 3.8);
-          const s3F   = wordsToFrames(`${props.scene3_titulo} ${props.scene3_cuerpo}`, FPS, 3.8);
-          const s4F   = wordsToFrames(`${props.scene4_titulo} ${props.scene4_cuerpo}`, FPS, 3.8);
-          const ctaF  = wordsToFrames(props.cta, FPS, 4.5);
+          const CAP = Math.round(FPS * 7);
+          const hookF = Math.min(wordsToFrames(props.hook, FPS, 4.0), CAP);
+          const s1F   = Math.min(wordsToFrames(`${props.scene1_titulo} ${props.scene1_cuerpo}`, FPS, 3.8), CAP);
+          const s2F   = Math.min(wordsToFrames(`${props.scene2_titulo} ${props.scene2_cuerpo}`, FPS, 3.8), CAP);
+          const s3F   = Math.min(wordsToFrames(`${props.scene3_titulo} ${props.scene3_cuerpo}`, FPS, 3.8), CAP);
+          const s4F   = Math.min(wordsToFrames(`${props.scene4_titulo} ${props.scene4_cuerpo}`, FPS, 3.8), CAP);
+          const ctaF  = Math.min(wordsToFrames(props.cta, FPS, 4.5), CAP);
           const logoF = Math.round(3.0 * FPS);
           return {
             durationInFrames: hookF + s1F + s2F + s3F + s4F + ctaF + logoF - 6 * SETTLE,
@@ -109,9 +111,10 @@ export const RemotionRoot: React.FC = () => {
         component={Carousel}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
+          const CAP = Math.round(FPS * 8);
           const slides = props.slides || [];
           const slideDs = slides.map((s: { headline: string; body: string }) =>
-            wordsToFrames(`${s.headline} ${s.body}`, FPS, 4.0)
+            Math.min(wordsToFrames(`${s.headline} ${s.body}`, FPS, 4.0), CAP)
           );
           const logoD = Math.round(3.0 * FPS);
           return {
@@ -138,11 +141,13 @@ export const RemotionRoot: React.FC = () => {
         component={Reel}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
-          const b1 = wordsToFrames(props.beat1, FPS, 2.5);
-          const b2 = wordsToFrames(props.beat2, FPS, 2.5);
-          const b3 = wordsToFrames(props.beat3, FPS, 2.5);
-          const b4 = wordsToFrames(props.beat4, FPS, 2.5);
-          const ct = wordsToFrames(props.cta, FPS, 3.5);
+          const CAP_BEAT = Math.round(FPS * 7);
+          const CAP_CTA  = Math.round(FPS * 7);
+          const b1 = Math.min(wordsToFrames(props.beat1, FPS, 2.5), CAP_BEAT);
+          const b2 = Math.min(wordsToFrames(props.beat2, FPS, 2.5), CAP_BEAT);
+          const b3 = Math.min(wordsToFrames(props.beat3, FPS, 2.5), CAP_BEAT);
+          const b4 = Math.min(wordsToFrames(props.beat4, FPS, 2.5), CAP_BEAT);
+          const ct = Math.min(wordsToFrames(props.cta, FPS, 3.5), CAP_CTA);
           const lo = Math.round(3.0 * FPS);
           return { durationInFrames: b1 + b2 + b3 + b4 + ct + lo - 5 * SETTLE, props };
         }}
@@ -178,10 +183,11 @@ export const RemotionRoot: React.FC = () => {
         component={Keyword}
         calculateMetadata={async ({ props }) => {
           const SETTLE = 10;
-          const hd = wordsToFrames(props.hook, FPS, 3.0);
-          const pd = wordsToFrames(props.problema, FPS, 3.0);
-          const rd = wordsToFrames(props.prueba, FPS, 3.0);
-          const cd = wordsToFrames(`${props.cta} ${props.lead_magnet_label}`, FPS, 3.5);
+          const CAP = Math.round(FPS * 7);
+          const hd = Math.min(wordsToFrames(props.hook, FPS, 3.0), CAP);
+          const pd = Math.min(wordsToFrames(props.problema, FPS, 3.0), CAP);
+          const rd = Math.min(wordsToFrames(props.prueba, FPS, 3.0), CAP);
+          const cd = Math.min(wordsToFrames(`${props.cta} ${props.lead_magnet_label}`, FPS, 3.5), CAP);
           const ld = Math.round(3.0 * FPS);
           return { durationInFrames: hd + pd + rd + cd + ld - 4 * SETTLE, props };
         }}
