@@ -1,0 +1,324 @@
+{
+  "name": "🎨 Carousel Generator Bot",
+  "nodes": [
+    {
+      "id": "tg-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 300],
+      "parameters": {
+        "updates": ["message", "callback_query"],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": { "id": "1", "name": "Telegram API" }
+      }
+    },
+    {
+      "id": "parse-update",
+      "name": "Parse Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "parameters": {
+        "jsCode": "const update = $input.first().json;\nlet update_type = 'unknown', chat_id = '', text = '', callback_data = '', callback_query_id = '';\nif (update.message) {\n  update_type = 'message';\n  chat_id = String(update.message.chat.id);\n  text = update.message.text || '';\n} else if (update.callback_query) {\n  update_type = 'callback_query';\n  chat_id = String(update.callback_query.message.chat.id);\n  callback_data = update.callback_query.data || '';\n  callback_query_id = String(update.callback_query.id);\n}\nreturn [{ json: { update_type, chat_id, text, callback_data, callback_query_id } }];"
+      }
+    },
+    {
+      "id": "get-sessions",
+      "name": "Get All Sessions",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 300],
+      "continueOnFail": true,
+      "parameters": {
+        "operation": "getAll",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" }
+      }
+    },
+    {
+      "id": "router-logic",
+      "name": "Router Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300],
+      "parameters": {
+        "jsCode": "const update = $('Parse Update').first().json;\nconst { update_type, chat_id, text, callback_data, callback_query_id } = update;\n\nlet session = null;\ntry {\n  const sessions = $('Get All Sessions').all();\n  session = sessions.find(s => String(s.json.chat_id) === String(chat_id));\n} catch(e) {}\n\nconst state  = session?.json?.state  || 'idle';\nconst topic  = session?.json?.topic  || '';\nconst theme  = session?.json?.theme  || 'dark';\n\nlet action = 'ignore', new_state = state, new_topic = topic, new_theme = theme;\nlet num_slides = '7', theme_label = '🌑 Oscuro';\n\nif (update_type === 'message') {\n  if (text === '/carrusel' || text.toLowerCase().trim() === 'carrusel') {\n    action = 'ask_topic'; new_state = 'waiting_topic';\n  } else if (state === 'waiting_topic' && text && !text.startsWith('/')) {\n    action = 'show_themes'; new_state = 'waiting_theme'; new_topic = text;\n  }\n} else if (update_type === 'callback_query') {\n  if (callback_data.startsWith('theme:')) {\n    new_theme = callback_data.split(':')[1];\n    action = 'show_slides'; new_state = 'waiting_slides';\n    const labels = { dark: '🌑 Oscuro', light: '☀️ Claro', photo: '📸 Foto real' };\n    theme_label = labels[new_theme] || new_theme;\n  } else if (callback_data.startsWith('slides:')) {\n    num_slides = callback_data.split(':')[1];\n    action = 'generate'; new_state = 'generating';\n  }\n}\n\nreturn [{ json: { action, chat_id, new_state, topic: new_topic, theme: new_theme, theme_label, num_slides, callback_query_id } }];"
+      }
+    },
+    {
+      "id": "switch-action",
+      "name": "Switch Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [880, 300],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.action }}", "rightValue": "ask_topic", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" },
+              "renameOutput": true, "outputKey": "ask_topic"
+            },
+            {
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.action }}", "rightValue": "show_themes", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" },
+              "renameOutput": true, "outputKey": "show_themes"
+            },
+            {
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.action }}", "rightValue": "show_slides", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" },
+              "renameOutput": true, "outputKey": "show_slides"
+            },
+            {
+              "conditions": { "conditions": [{ "leftValue": "={{ $json.action }}", "rightValue": "generate", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" },
+              "renameOutput": true, "outputKey": "generate"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      }
+    },
+    {
+      "id": "gsheets-ask",
+      "name": "GSheets — Init Session",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1100, 0],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "chat_id": "={{ $json.chat_id }}", "state": "waiting_topic", "topic": "", "theme": "dark", "num_slides": "7" },
+          "matchingColumns": ["chat_id"], "schema": []
+        },
+        "options": {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" } }
+    },
+    {
+      "id": "tg-ask-topic",
+      "name": "TG — Ask Topic",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1320, 0],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Router Logic').first().json.chat_id }}",
+        "text": "🎨 *Generador de Carruseles Digital Growth*\n\n¿Cuál es el tema del carrusel?\n\n_Ej: IA para restaurantes, automatización para clínicas, chatbots para gimnasios_",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "gsheets-save-topic",
+      "name": "GSheets — Save Topic",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1100, 220],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "chat_id": "={{ $json.chat_id }}", "state": "waiting_theme", "topic": "={{ $json.topic }}" },
+          "matchingColumns": ["chat_id"], "schema": []
+        },
+        "options": {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" } }
+    },
+    {
+      "id": "tg-theme-keyboard",
+      "name": "TG — Theme Keyboard",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1320, 220],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Router Logic').first().json.chat_id }}",
+        "text": "✅ Tema: *{{ $('Router Logic').first().json.topic }}*\n\n¿Qué tipo de fondo prefieres?",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": "{\"inline_keyboard\":[[{\"text\":\"🌑 Oscuro\",\"callback_data\":\"theme:dark\"},{\"text\":\"☀️ Claro\",\"callback_data\":\"theme:light\"}],[{\"text\":\"📸 Foto real (Unsplash)\",\"callback_data\":\"theme:photo\"}]]}"
+        }
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "tg-answer-slides",
+      "name": "TG — Answer CB Slides",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1100, 440],
+      "parameters": {
+        "resource": "callback",
+        "operation": "answerQuery",
+        "queryId": "={{ $json.callback_query_id }}",
+        "additionalFields": {}
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "gsheets-save-theme",
+      "name": "GSheets — Save Theme",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1320, 440],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "chat_id": "={{ $('Router Logic').first().json.chat_id }}", "state": "waiting_slides", "theme": "={{ $('Router Logic').first().json.theme }}" },
+          "matchingColumns": ["chat_id"], "schema": []
+        },
+        "options": {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" } }
+    },
+    {
+      "id": "tg-slides-keyboard",
+      "name": "TG — Slides Keyboard",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1540, 440],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Router Logic').first().json.chat_id }}",
+        "text": "✅ Fondo: *{{ $('Router Logic').first().json.theme_label }}*\n\n¿Cuántos slides quieres?",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": "{\"inline_keyboard\":[[{\"text\":\"5 slides\",\"callback_data\":\"slides:5\"},{\"text\":\"7 slides\",\"callback_data\":\"slides:7\"},{\"text\":\"10 slides\",\"callback_data\":\"slides:10\"}]]}"
+        }
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "tg-answer-gen",
+      "name": "TG — Answer CB Generate",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1100, 660],
+      "parameters": {
+        "resource": "callback",
+        "operation": "answerQuery",
+        "queryId": "={{ $json.callback_query_id }}",
+        "additionalFields": {}
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "gsheets-save-slides",
+      "name": "GSheets — Save Slides",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1320, 660],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "chat_id": "={{ $('Router Logic').first().json.chat_id }}", "state": "generating", "num_slides": "={{ $('Router Logic').first().json.num_slides }}" },
+          "matchingColumns": ["chat_id"], "schema": []
+        },
+        "options": {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" } }
+    },
+    {
+      "id": "tg-generando",
+      "name": "TG — Generando",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1540, 660],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Router Logic').first().json.chat_id }}",
+        "text": "⏳ Generando tu carrusel de *{{ $('Router Logic').first().json.num_slides }} slides* sobre:\n\n_{{ $('Router Logic').first().json.topic }}_\n\nEsto tarda entre 30 y 60 segundos ☕",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "credentials": { "telegramApi": { "id": "1", "name": "Telegram API" } }
+    },
+    {
+      "id": "http-carousel-api",
+      "name": "HTTP — Carousel API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 660],
+      "parameters": {
+        "method": "POST",
+        "url": "https://REEMPLAZAR_CON_URL_CAROUSEL_API/generate",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "topic",      "value": "={{ $('Router Logic').first().json.topic }}" },
+            { "name": "theme",      "value": "={{ $('Router Logic').first().json.theme }}" },
+            { "name": "num_slides", "value": "={{ $('Router Logic').first().json.num_slides }}" },
+            { "name": "chat_id",    "value": "={{ $('Router Logic').first().json.chat_id }}" }
+          ]
+        },
+        "options": { "timeout": 180000 }
+      }
+    },
+    {
+      "id": "gsheets-done",
+      "name": "GSheets — Mark Idle",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1980, 660],
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": { "__rl": true, "value": "REEMPLAZAR_CON_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sessions", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "chat_id": "={{ $('Router Logic').first().json.chat_id }}", "state": "idle" },
+          "matchingColumns": ["chat_id"], "schema": []
+        },
+        "options": {}
+      },
+      "credentials": { "googleSheetsOAuth2Api": { "id": "2", "name": "Google Sheets account" } }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger":         { "main": [[{ "node": "Parse Update",          "type": "main", "index": 0 }]] },
+    "Parse Update":             { "main": [[{ "node": "Get All Sessions",       "type": "main", "index": 0 }]] },
+    "Get All Sessions":         { "main": [[{ "node": "Router Logic",           "type": "main", "index": 0 }]] },
+    "Router Logic":             { "main": [[{ "node": "Switch Action",          "type": "main", "index": 0 }]] },
+    "Switch Action": {
+      "main": [
+        [{ "node": "GSheets — Init Session",   "type": "main", "index": 0 }],
+        [{ "node": "GSheets — Save Topic",     "type": "main", "index": 0 }],
+        [{ "node": "TG — Answer CB Slides",    "type": "main", "index": 0 }],
+        [{ "node": "TG — Answer CB Generate",  "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "GSheets — Init Session":   { "main": [[{ "node": "TG — Ask Topic",        "type": "main", "index": 0 }]] },
+    "GSheets — Save Topic":     { "main": [[{ "node": "TG — Theme Keyboard",   "type": "main", "index": 0 }]] },
+    "TG — Answer CB Slides":    { "main": [[{ "node": "GSheets — Save Theme",  "type": "main", "index": 0 }]] },
+    "GSheets — Save Theme":     { "main": [[{ "node": "TG — Slides Keyboard",  "type": "main", "index": 0 }]] },
+    "TG — Answer CB Generate":  { "main": [[{ "node": "GSheets — Save Slides", "type": "main", "index": 0 }]] },
+    "GSheets — Save Slides":    { "main": [[{ "node": "TG — Generando",        "type": "main", "index": 0 }]] },
+    "TG — Generando":           { "main": [[{ "node": "HTTP — Carousel API",   "type": "main", "index": 0 }]] },
+    "HTTP — Carousel API":      { "main": [[{ "node": "GSheets — Mark Idle",   "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
