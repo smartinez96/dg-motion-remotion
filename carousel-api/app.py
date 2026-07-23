@@ -155,12 +155,11 @@ def generate():
             raise Exception(f"Generator stderr: {result.stderr[:500]}")
 
         # 5. Recolectar imágenes generadas
-        name       = config.get("name", "carousel").replace(" ", "-").lower()
-        slide_dir  = out_dir / name
-        images     = sorted(slide_dir.glob("*.png"))
+        name   = config.get("name", "carousel").replace(" ", "-").lower()
+        images = sorted(out_dir.glob("*.png"))
 
         if not images:
-            raise Exception(f"No se generaron imágenes en {slide_dir}")
+            raise Exception(f"No se generaron imágenes en {out_dir}")
 
         # 6. Enviar al chat de Telegram
         send_images_to_telegram(chat_id, [str(p) for p in images])
