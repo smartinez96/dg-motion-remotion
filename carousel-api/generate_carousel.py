@@ -323,11 +323,11 @@ def slide_tip(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:50px;">{dots(i,tot,T)}</div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="margin-bottom:26px;">{badge(tag,T)}</div>
-    <h2 style="font-size:58px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:34px;">{h}</h2>
-    <div style="display:flex;flex-direction:column;gap:13px;">{rows}</div>
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="margin-bottom:22px;">{badge(tag,T)}</div>
+    <h2 style="font-size:58px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:30px;">{h}</h2>
+    <div style="display:flex;flex-direction:column;gap:16px;">{rows}</div>
   </div>
   {footer(T)}
 </div>'''
@@ -384,10 +384,10 @@ def slide_timeline(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:48px;">{dots(i,tot,T)}</div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="margin-bottom:24px;">{badge(tag,T)}</div>
-    <h2 style="font-size:56px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:40px;">{h}</h2>
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="margin-bottom:22px;">{badge(tag,T)}</div>
+    <h2 style="font-size:56px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:34px;">{h}</h2>
     <div style="display:flex;flex-direction:column;">{rows}</div>
   </div>
   {footer(T)}
@@ -415,10 +415,10 @@ def slide_process(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:46px;">{dots(i,tot,T)}</div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="margin-bottom:22px;">{badge(tag,T)}</div>
-    <h2 style="font-size:54px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:36px;">{h}</h2>
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="margin-bottom:20px;">{badge(tag,T)}</div>
+    <h2 style="font-size:54px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:30px;">{h}</h2>
     <div style="display:flex;flex-direction:column;">{rows}</div>
   </div>
   {footer(T)}
@@ -464,10 +464,10 @@ def slide_before_after(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:46px;">{dots(i,tot,T)}</div>
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
   <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="margin-bottom:20px;">{badge(tag,T)}</div>
-    <h2 style="font-size:54px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:32px;">{h}</h2>
+    <div style="margin-bottom:16px;">{badge(tag,T)}</div>
+    <h2 style="font-size:52px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:24px;">{h}</h2>
     <div style="display:flex;gap:14px;flex:1;">{col(before_label, before, False)}{col(after_label, after, True)}</div>
   </div>
   {footer(T)}
@@ -490,9 +490,9 @@ def slide_news(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:42px;">{dots(i,tot,T)}</div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;">
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
       {badge(tag,T,sm=True)}
       {"<span style='font-size:20px;font-weight:600;color:"+T["text_faint"]+";letter-spacing:1px;'>"+date+"</span>" if date else ""}
     </div>
@@ -535,10 +535,10 @@ def slide_educational(s, i, tot, T, bg, ov):
     css = base_css(T, bg)
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
-  <div style="margin-bottom:46px;">{dots(i,tot,T)}</div>
-  <div style="flex:1;display:flex;flex-direction:column;">
-    <div style="margin-bottom:22px;">{badge(tag,T)}</div>
-    <h2 style="font-size:56px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:30px;">{h}</h2>
+  <div style="margin-bottom:36px;">{dots(i,tot,T)}</div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div style="margin-bottom:20px;">{badge(tag,T)}</div>
+    <h2 style="font-size:56px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:26px;">{h}</h2>
     {def_h}{pts_h}
   </div>
   {footer(T)}
