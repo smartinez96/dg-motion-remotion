@@ -26,18 +26,18 @@ ESTRUCTURA DEL JSON (responde ÚNICAMENTE con JSON válido, sin texto adicional,
   "slides": [...]
 }
 
-TIPOS DE SLIDES Y SUS CAMPOS EXACTOS:
+TIPOS DE SLIDES Y SUS CAMPOS EXACTOS (usa EXACTAMENTE estos nombres de campo):
 
-cover: {"type":"cover","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","hook":"Frase gancho de impacto","cta_swipe":"Desliza y descúbrelo →"}
-content: {"type":"content","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","headline":"Título","points":["punto 1","punto 2","punto 3"]}
-stat: {"type":"stat","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","stat":"X%","label":"descripción del dato","context":"fuente o contexto"}
-tip: {"type":"tip","bg_style":"...","tag":"CATEGORÍA","title":"Título del tip","tips":[{"icon":"🔥","text":"consejo"},{"icon":"✅","text":"consejo"}]}
-quote: {"type":"quote","bg_style":"...","photo_query":"...","quote":"Frase poderosa.","author":"Digital Growth","author_role":"Quito, Ecuador"}
-timeline: {"type":"timeline","bg_style":"...","tag":"CATEGORÍA","title":"Título","items":[{"year":"2020","text":"Evento"},{"year":"2024","text":"Evento"}]}
-process: {"type":"process","bg_style":"...","tag":"CATEGORÍA","title":"Título del proceso","steps":[{"title":"Paso","desc":"Descripción"}]}
-before_after: {"type":"before_after","bg_style":"...","tag":"CATEGORÍA","title":"Título","before":{"label":"SIN IA","points":["punto"]},"after":{"label":"CON IA","points":["punto"]}}
-news: {"type":"news","bg_style":"...","photo_query":"...","tag":"ACTUALIDAD","headline":"Titular de noticia","body":"Cuerpo de 2-3 líneas","source":"Fuente"}
-educational: {"type":"educational","bg_style":"...","tag":"CATEGORÍA","headline":"Título educativo","points":[{"icon":"🧠","title":"Concepto","desc":"Explicación breve"}]}
+cover: {"type":"cover","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","hook":"Frase gancho de impacto máximo","cta_swipe":"Desliza y descúbrelo →"}
+content: {"type":"content","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","headline":"Título del punto","body":"Párrafo de 2-3 líneas explicando el punto con contexto real y valor concreto para el negocio"}
+stat: {"type":"stat","bg_style":"...","photo_query":"...","tag":"CATEGORÍA","stat":"X%","label":"Descripción clara del dato","context":"Fuente o contexto que lo hace creíble"}
+tip: {"type":"tip","bg_style":"...","tag":"CATEGORÍA","headline":"Título del tip","tips":[{"icon":"🔥","text":"Consejo accionable completo de 1 línea"},{"icon":"✅","text":"Consejo accionable completo de 1 línea"}]}
+quote: {"type":"quote","bg_style":"...","photo_query":"...","quote":"Frase poderosa y directa.","author":"Digital Growth","author_role":"Quito, Ecuador"}
+timeline: {"type":"timeline","bg_style":"...","tag":"CATEGORÍA","headline":"Título de la línea de tiempo","events":[{"label":"2020","text":"Descripción completa de qué pasó ese año"},{"label":"2024","text":"Descripción completa"}]}
+process: {"type":"process","bg_style":"...","tag":"CATEGORÍA","headline":"Título del proceso","steps":[{"title":"Nombre del paso","text":"Qué implica este paso y cómo beneficia al negocio"}]}
+before_after: {"type":"before_after","bg_style":"...","tag":"CATEGORÍA","headline":"Título comparativo","before":["Punto negativo completo 1","Punto negativo completo 2","Punto negativo completo 3"],"after":["Beneficio completo 1","Beneficio completo 2","Beneficio completo 3"]}
+news: {"type":"news","bg_style":"...","photo_query":"...","tag":"ACTUALIDAD","headline":"Titular de noticia impactante","body":"Cuerpo de 2-3 líneas con contexto real","source":"Fuente"}
+educational: {"type":"educational","bg_style":"...","tag":"CATEGORÍA","headline":"¿Pregunta o título educativo?","definition":"Definición en 1-2 líneas directas (opcional)","points":[{"title":"Concepto","text":"Explicación completa en 1 línea"}]}
 cta: {"type":"cta","bg_style":"...","photo_query":"...","tag":"TU TURNO","headline":"¿Pregunta de cierre impactante?","subtext":"Diagnóstico gratuito en 20 minutos. Sin compromisos.","cta":"Escríbenos ahora"}
 
 ESTILOS DE FONDO (bg_style):
@@ -49,16 +49,25 @@ ESTILOS DE FONDO (bg_style):
 - "glow": resplandor naranja central
 - "photo": foto real de Unsplash (requiere photo_query en inglés)
 
+ESTRUCTURA NARRATIVA SEGÚN NÚMERO DE SLIDES (el carrusel debe contar una historia coherente de inicio a fin):
+- 5 slides: cover → [stat O content] → [process O tip] → [before_after O quote] → cta
+- 7 slides: cover → content → stat → [tip O before_after] → process → quote → cta
+- 10 slides: cover → content → stat → tip → process → before_after → stat → educational → quote → cta
+- Cada slide debe ser el siguiente paso lógico del anterior. El lector debe entender la historia completa.
+
 REGLAS OBLIGATORIAS:
-1. El PRIMER slide siempre es "cover" con hook que genere curiosidad o urgencia
+1. El PRIMER slide siempre es "cover" con hook que genere curiosidad o urgencia máxima
 2. El ÚLTIMO slide siempre es "cta" con las frases exactas de Digital Growth
 3. Contenido en español, directo, para dueños de negocios (restaurantes, clínicas, gimnasios, etc.)
 4. El campo "tag" siempre en MAYÚSCULAS
 5. Si un slide tiene bg_style "photo", DEBE tener photo_query en inglés relevante al contenido
 6. No repetir el mismo tipo de slide más de 2 veces seguidas
-7. Mezclar estilos de fondo para variedad visual
+7. Mezclar estilos de fondo para variedad visual (no todos oscuros, no todos iguales)
 8. Las estadísticas deben sonar reales y relevantes para Ecuador/LATAM
 9. El CTA siempre termina con "Escríbenos ahora" y "Diagnóstico gratuito en 20 minutos"
+10. TODOS los campos de texto DEBEN tener contenido real y completo — NUNCA dejar "text", "body", "desc" o "definition" vacíos
+11. Los campos "steps[].text", "tips[].text", "points[].text", "events[].text" deben tener AL MENOS una oración completa con valor real
+12. El "before_after" usa listas planas: "before":["punto 1","punto 2"] y "after":["punto 1","punto 2"]
 
 RESPONDE ÚNICAMENTE CON EL JSON. SIN EXPLICACIONES. SIN MARKDOWN. SIN TEXTO ANTES O DESPUÉS."""
 

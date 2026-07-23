@@ -243,11 +243,25 @@ def slide_cover(s, i, tot, T, bg, ov):
 
 # ── CONTENT ────────────────────────────────────────────────────────────────────
 def slide_content(s, i, tot, T, bg, ov):
-    num  = s.get("number", f"{i:02d}")
-    h    = s.get("headline", "")
-    body = s.get("body", "")
-    tag  = s.get("tag", "")
-    css  = base_css(T, bg)
+    num    = s.get("number", f"{i:02d}")
+    h      = s.get("headline", "")
+    tag    = s.get("tag", "")
+    points = s.get("points", [])
+    body   = s.get("body", "")
+    css    = base_css(T, bg)
+    if points:
+        pts_html = "".join(
+            f'<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">'
+            f'<div style="width:8px;height:8px;border-radius:50%;background:{ORANGE};flex-shrink:0;'
+            f'margin-top:12px;box-shadow:0 0 8px {ORANGE}88;"></div>'
+            f'<p style="font-size:30px;font-weight:400;line-height:1.50;color:{T["text_dim"]};margin:0;">{pt}</p></div>'
+            for pt in points
+        )
+        body_html = f'<div style="display:flex;flex-direction:column;">{pts_html}</div>'
+    elif body:
+        body_html = f'<p style="font-size:34px;font-weight:400;line-height:1.62;color:{T["text_dim"]};max-width:880px;">{body}</p>'
+    else:
+        body_html = ""
     html = f'''
 <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:{H}px;padding:68px 84px 0;">
   <div style="margin-bottom:58px;">{dots(i,tot,T)}</div>
@@ -260,7 +274,7 @@ def slide_content(s, i, tot, T, bg, ov):
         text-shadow:0 0 40px {ORANGE}55;">{num}</div>
     </div>
     <h2 style="font-size:66px;font-weight:900;line-height:1.12;letter-spacing:-1px;color:{T["text"]};margin-bottom:30px;">{h}</h2>
-    <p style="font-size:34px;font-weight:400;line-height:1.62;color:{T["text_dim"]};max-width:880px;">{body}</p>
+    {body_html}
   </div>
   {footer(T)}
 </div>'''
@@ -290,7 +304,7 @@ def slide_stat(s, i, tot, T, bg, ov):
 
 # ── TIP ────────────────────────────────────────────────────────────────────────
 def slide_tip(s, i, tot, T, bg, ov):
-    h    = s.get("headline", "")
+    h    = s.get("headline", s.get("title", ""))
     tips = s.get("tips", [])
     tag  = s.get("tag", "TIPS")
     rows = ""
@@ -349,9 +363,9 @@ def slide_quote(s, i, tot, T, bg, ov):
 
 # ── TIMELINE ───────────────────────────────────────────────────────────────────
 def slide_timeline(s, i, tot, T, bg, ov):
-    h      = s.get("headline", "")
+    h      = s.get("headline", s.get("title", ""))
     tag    = s.get("tag", "TIMELINE")
-    events = s.get("events", [])
+    events = s.get("events", s.get("items", []))
     rows   = ""
     for j, ev in enumerate(events):
         hl   = ev.get("highlight", False)
@@ -364,7 +378,7 @@ def slide_timeline(s, i, tot, T, bg, ov):
                  f'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">'
                  f'<div style="width:24px;height:24px;border-radius:50%;background:{dc};{glow}"></div>{conn}</div>'
                  f'<div style="padding-bottom:22px;">'
-                 f'<div style="font-size:21px;font-weight:800;letter-spacing:2px;color:{lc};margin-bottom:5px;">{ev.get("label","")}</div>'
+                 f'<div style="font-size:21px;font-weight:800;letter-spacing:2px;color:{lc};margin-bottom:5px;">{ev.get("label", ev.get("year",""))}</div>'
                  f'<div style="font-size:29px;font-weight:500;line-height:1.45;color:{T["text"]};">{ev.get("text","")}</div>'
                  f'</div></div>')
     css = base_css(T, bg)
@@ -382,7 +396,7 @@ def slide_timeline(s, i, tot, T, bg, ov):
 
 # ── PROCESS ────────────────────────────────────────────────────────────────────
 def slide_process(s, i, tot, T, bg, ov):
-    h     = s.get("headline", "")
+    h     = s.get("headline", s.get("title", ""))
     tag   = s.get("tag", "PROCESO")
     steps = s.get("steps", [])
     rows  = ""
@@ -396,7 +410,7 @@ def slide_process(s, i, tot, T, bg, ov):
                  f'font-size:19px;font-weight:900;color:#FFF;box-shadow:0 0 14px {ORANGE}66;">{j+1:02d}</div>{conn}</div>'
                  f'<div style="padding-bottom:{0 if j==len(steps)-1 else 16}px;padding-top:6px;">'
                  f'<div style="font-size:27px;font-weight:800;color:{T["text"]};margin-bottom:3px;">{st.get("title","")}</div>'
-                 f'<div style="font-size:26px;font-weight:400;line-height:1.45;color:{T["text_dim"]};">{st.get("text","")}</div>'
+                 f'<div style="font-size:26px;font-weight:400;line-height:1.45;color:{T["text_dim"]};">{st.get("text", st.get("desc",""))}</div>'
                  f'</div></div>')
     css = base_css(T, bg)
     html = f'''
@@ -413,10 +427,22 @@ def slide_process(s, i, tot, T, bg, ov):
 
 # ── BEFORE / AFTER ─────────────────────────────────────────────────────────────
 def slide_before_after(s, i, tot, T, bg, ov):
-    h      = s.get("headline", "")
-    tag    = s.get("tag", "COMPARACIÓN")
-    before = s.get("before", [])
-    after  = s.get("after", [])
+    h          = s.get("headline", s.get("title", ""))
+    tag        = s.get("tag", "COMPARACIÓN")
+    before_raw = s.get("before", [])
+    after_raw  = s.get("after", [])
+    if isinstance(before_raw, dict):
+        before_label = before_raw.get("label", "SIN IA")
+        before = before_raw.get("points", [])
+    else:
+        before_label = "SIN IA"
+        before = before_raw
+    if isinstance(after_raw, dict):
+        after_label = after_raw.get("label", "CON IA")
+        after = after_raw.get("points", [])
+    else:
+        after_label = "CON IA"
+        after = after_raw
 
     def col(title, items, good):
         c   = ORANGE if good else T["bad_color"]
@@ -442,7 +468,7 @@ def slide_before_after(s, i, tot, T, bg, ov):
   <div style="flex:1;display:flex;flex-direction:column;">
     <div style="margin-bottom:20px;">{badge(tag,T)}</div>
     <h2 style="font-size:54px;font-weight:900;line-height:1.15;color:{T["text"]};margin-bottom:32px;">{h}</h2>
-    <div style="display:flex;gap:14px;flex:1;">{col("ANTES", before, False)}{col("DESPUÉS", after, True)}</div>
+    <div style="display:flex;gap:14px;flex:1;">{col(before_label, before, False)}{col(after_label, after, True)}</div>
   </div>
   {footer(T)}
 </div>'''
@@ -499,7 +525,7 @@ def slide_educational(s, i, tot, T, bg, ov):
                       f'<div style="width:8px;height:8px;border-radius:50%;background:{ORANGE};flex-shrink:0;margin-top:10px;'
                       f'box-shadow:0 0 8px {ORANGE}88;"></div><div>'
                       f'<span style="font-size:27px;font-weight:700;color:{T["text"]};">{pt.get("title","")}: </span>'
-                      f'<span style="font-size:27px;font-weight:400;color:{T["text_dim"]};">{pt.get("text","")}</span>'
+                      f'<span style="font-size:27px;font-weight:400;color:{T["text_dim"]};">{pt.get("text", pt.get("desc",""))}</span>'
                       f'</div></div>')
         else:
             pts_h += (f'<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">'
